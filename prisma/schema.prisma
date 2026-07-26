@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  CLOSED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+model Category {
+  id       String     @id @default(cuid())
+  name     String
+  slug     String     @unique
+  parentId String?
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  products Product[]
+}
+
+model Product {
+  id          String           @id @default(cuid())
+  name        String
+  slug        String           @unique
+  description String
+  categoryId  String
+  category    Category         @relation(fields: [categoryId], references: [id])
+  sanityDocId String?
+  variants    ProductVariant[]
+  inquiries   Inquiry[]
+}
+
+model ProductVariant {
+  id         String      @id @default(cuid())
+  productId  String
+  product    Product     @relation(fields: [productId], references: [id])
+  sku        String      @unique
+  price      Decimal
+  stock      Int         @default(0)
+  attributes Json
+  orderItems OrderItem[]
+  inquiries  Inquiry[]
+}
+
+model Inquiry {
+  id        String          @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  productId String?
+  product   Product?        @relation(fields: [productId], references: [id])
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+  message   String?
+  status    InquiryStatus   @default(NEW)
+  createdAt DateTime        @default(now())
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  userId          String
+  items           OrderItem[]
+  total           Decimal
+  paymentStatus   PaymentStatus @default(PENDING)
+  paymentNote     String?
+  deliveryName    String
+  deliveryPhone   String
+  deliveryAddress String
+  deliveryCity    String
+  createdAt       DateTime      @default(now())
+}
+
+model OrderItem {
+  id        String         @id @default(cuid())
+  orderId   String
+  order     Order          @relation(fields: [orderId], references: [id])
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+  quantity  Int
+  price     Decimal
+}
