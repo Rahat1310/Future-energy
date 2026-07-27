@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Show, UserButton } from "@clerk/nextjs";
+import { UserButton, useAuth } from "@clerk/nextjs";
 import { ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { CartButton } from "@/components/cart/cart-button";
 import { SiteSearch } from "@/components/marketing/site-search";
@@ -127,6 +127,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const [isScrolled, setIsScrolled] = useState(!isHome);
+  const { isSignedIn } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openCategory, setOpenCategory] = useState<string | null>(null);
   const [openBrand, setOpenBrand] = useState<string | null>(null);
@@ -204,7 +205,9 @@ export function SiteHeader() {
             Request a quote
           </Link>
           <CartButton light={isTransparent} />
-          <Show when="signed-out">
+          {isSignedIn ? (
+            <UserButton />
+          ) : (
             <Button
               variant="outline"
               size="sm"
@@ -212,10 +215,7 @@ export function SiteHeader() {
               nativeButton={false}
               render={<Link href="/sign-in">Sign in</Link>}
             />
-          </Show>
-          <Show when="signed-in">
-            <UserButton />
-          </Show>
+          )}
           <button
             type="button"
             className={`inline-flex size-9 items-center justify-center rounded-lg border lg:hidden ${
