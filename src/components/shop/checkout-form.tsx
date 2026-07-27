@@ -13,6 +13,8 @@ export function CheckoutForm() {
   const { items, total, clear, itemCount } = useCart();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  /** Prevents empty-cart UI/redirect from racing the payment navigation. */
+  const [redirectingTo, setRedirectingTo] = useState<string | null>(null);
 
   const [deliveryName, setDeliveryName] = useState("");
   const [deliveryPhone, setDeliveryPhone] = useState("");
@@ -20,10 +22,18 @@ export function CheckoutForm() {
   const [deliveryCity, setDeliveryCity] = useState("");
 
   useEffect(() => {
-    if (itemCount === 0) {
+    if (itemCount === 0 && !redirectingTo && !pending) {
       router.replace("/shop");
     }
-  }, [itemCount, router]);
+  }, [itemCount, router, redirectingTo, pending]);
+
+  if (redirectingTo) {
+    return (
+      <p className="text-muted-foreground">
+        Order placed — taking you to payment…
+      </p>
+    );
+  }
 
   if (itemCount === 0) {
     return (
@@ -58,8 +68,10 @@ export function CheckoutForm() {
         return;
       }
 
+      const paymentPath = `/orders/${result.orderId}/payment`;
+      setRedirectingTo(paymentPath);
       clear();
-      router.push(`/orders/${result.orderId}/payment`);
+      router.push(paymentPath);
     });
   }
 

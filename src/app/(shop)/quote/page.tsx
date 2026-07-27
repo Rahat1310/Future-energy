@@ -13,6 +13,7 @@ type PageProps = {
     productId?: string;
     variant?: string;
     variantId?: string;
+    message?: string;
   }>;
 };
 
@@ -38,6 +39,7 @@ export default async function QuotePage({ searchParams }: PageProps) {
           variantSku: variant?.sku ?? null,
           productSlug: product?.slug ?? null,
         }}
+        initialMessage={params.message?.trim() ?? ""}
       />
     </div>
   );

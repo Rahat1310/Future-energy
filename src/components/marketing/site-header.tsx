@@ -3,8 +3,9 @@
 import { Suspense, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { UserButton, useAuth } from "@clerk/nextjs";
+import { UserButton, useAuth, useUser } from "@clerk/nextjs";
 import { ChevronDown, ChevronRight, Menu, X } from "lucide-react";
+import { AccountLinks } from "@/components/marketing/account-links";
 import { CartButton } from "@/components/cart/cart-button";
 import { SiteSearch } from "@/components/marketing/site-search";
 import { Button } from "@/components/ui/button";
@@ -128,9 +129,13 @@ export function SiteHeader() {
   const isHome = pathname === "/";
   const [isScrolled, setIsScrolled] = useState(!isHome);
   const { isSignedIn } = useAuth();
+  const { user } = useUser();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openCategory, setOpenCategory] = useState<string | null>(null);
   const [openBrand, setOpenBrand] = useState<string | null>(null);
+  const isStaff =
+    user?.publicMetadata?.role === "admin" ||
+    user?.publicMetadata?.role === "dealer";
 
   useEffect(() => {
     if (!isHome) {
@@ -206,7 +211,18 @@ export function SiteHeader() {
           </Link>
           <CartButton light={isTransparent} />
           {isSignedIn ? (
-            <UserButton />
+            <>
+              <AccountLinks light={isTransparent} />
+              <div className="sm:hidden">
+                <Link
+                  href="/orders"
+                  className={`mr-2 text-sm font-medium ${isTransparent ? "text-white/80" : "text-muted-foreground"}`}
+                >
+                  Orders
+                </Link>
+                <UserButton />
+              </div>
+            </>
           ) : (
             <Button
               variant="outline"
@@ -334,6 +350,18 @@ export function SiteHeader() {
             >
               Request a quote
             </Link>
+            {isSignedIn ? (
+              <>
+                <Link href="/orders" className="py-2 text-sm font-medium">
+                  My orders
+                </Link>
+                {isStaff ? (
+                  <Link href="/admin" className="py-2 text-sm font-medium">
+                    Admin panel
+                  </Link>
+                ) : null}
+              </>
+            ) : null}
           </nav>
         </div>
       ) : null}

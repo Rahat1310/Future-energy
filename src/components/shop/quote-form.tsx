@@ -13,11 +13,17 @@ type QuoteTarget = {
   productSlug: string | null;
 };
 
-export function QuoteForm({ target }: { target: QuoteTarget }) {
+export function QuoteForm({
+  target,
+  initialMessage = "",
+}: {
+  target: QuoteTarget;
+  initialMessage?: string;
+}) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(initialMessage);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [pending, startTransition] = useTransition();

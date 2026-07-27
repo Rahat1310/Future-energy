@@ -100,6 +100,8 @@ export async function createOrderFromCart(
   });
 
   revalidatePath(`/orders/${order.id}/payment`);
+  revalidatePath(`/orders/${order.id}`);
+  revalidatePath("/orders");
   return { ok: true, orderId: order.id };
 }
 
@@ -144,7 +146,61 @@ export async function submitPaymentNote(
   });
 
   revalidatePath(`/orders/${orderId}/payment`);
+  revalidatePath(`/orders/${orderId}`);
+  revalidatePath("/orders");
   return { ok: true };
+}
+
+export type CustomerOrderSummary = {
+  id: string;
+  total: number;
+  paymentStatus: "PENDING" | "PAID" | "FAILED";
+  paymentNote: string | null;
+  createdAt: string;
+  itemCount: number;
+  firstProductName: string;
+};
+
+export async function getOrdersForUser(): Promise<CustomerOrderSummary[]> {
+  const { userId } = await auth();
+  if (!userId) return [];
+
+  const orders = await db.order.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      total: true,
+      paymentStatus: true,
+      paymentNote: true,
+      createdAt: true,
+      items: {
+        take: 1,
+        orderBy: { id: "asc" },
+        select: {
+          variant: {
+            select: { product: { select: { name: true } } },
+          },
+        },
+      },
+      _count: { select: { items: true } },
+    },
+  });
+
+  return orders.map((order) => ({
+    id: order.id,
+    total: Number(order.total),
+    paymentStatus: order.paymentStatus,
+    paymentNote: order.paymentNote,
+    createdAt: order.createdAt.toISOString(),
+    itemCount: order._count.items,
+    firstProductName: order.items[0]?.variant.product.name ?? "Order items",
+  }));
+}
+
+/** Alias used by the customer order status page. */
+export async function getOrderForUser(orderId: string) {
+  return getOrderForPayment(orderId);
 }
 
 export async function getOrderForPayment(orderId: string) {

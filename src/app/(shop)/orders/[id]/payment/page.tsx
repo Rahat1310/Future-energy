@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { OrderSupport } from "@/components/shop/order-support";
 import { PaymentNoteForm } from "@/components/shop/payment-note-form";
 import { formatPrice, getKeySpec } from "@/lib/catalog";
 import { PAYMENT_CONFIRMATION_HOURS } from "@/lib/constants";
@@ -156,6 +157,25 @@ export default async function OrderPaymentPage({ params }: PageProps) {
           initialNote={order.paymentNote}
         />
       </section>
+
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Link
+          href={`/orders/${order.id}`}
+          className="text-sm font-medium text-brand hover:underline"
+        >
+          View order status
+        </Link>
+        <Link
+          href="/orders"
+          className="text-sm text-muted-foreground hover:text-ink"
+        >
+          All my orders
+        </Link>
+      </div>
+
+      <div className="mt-6">
+        <OrderSupport orderId={order.id} />
+      </div>
     </div>
   );
 }

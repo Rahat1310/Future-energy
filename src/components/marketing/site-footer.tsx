@@ -103,6 +103,14 @@ export function SiteFooter() {
               </li>
               <li>
                 <Link
+                  href="/orders"
+                  className="text-white/80 transition-colors hover:text-signal"
+                >
+                  My orders
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/checkout"
                   className="text-white/80 transition-colors hover:text-signal"
                 >
