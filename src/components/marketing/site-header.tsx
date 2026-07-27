@@ -4,13 +4,14 @@ import { Suspense, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Show, UserButton } from "@clerk/nextjs";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { CartButton } from "@/components/cart/cart-button";
 import { SiteSearch } from "@/components/marketing/site-search";
 import { Button } from "@/components/ui/button";
-import { ALL_PRODUCTS_LINK, MAIN_NAV, type NavItem } from "@/lib/nav";
+import { ALL_PRODUCTS_LINK, MAIN_NAV, type NavBrand, type NavItem } from "@/lib/nav";
 
-function NavDropdown({
+/** Two-column mega-menu: left = brands, right = sub-items for hovered brand */
+function MegaMenu({
   item,
   linkClass,
   panelClass,
@@ -19,8 +20,13 @@ function NavDropdown({
   linkClass: string;
   panelClass: string;
 }) {
+  const [activeBrand, setActiveBrand] = useState<NavBrand | null>(null);
+
+  const isTransparentPanel = panelClass.includes("bg-ink");
+
   return (
-    <div className="group relative">
+    <div className="group relative" onMouseLeave={() => setActiveBrand(null)}>
+      {/* Top-level nav link — always clickable */}
       <Link
         href={item.href}
         className={`inline-flex items-center gap-1 transition-colors ${linkClass}`}
@@ -28,19 +34,89 @@ function NavDropdown({
         {item.label}
         <ChevronDown className="size-3.5 opacity-70 transition-transform duration-200 group-hover:rotate-180 group-focus-within:rotate-180" />
       </Link>
+
+      {/* Mega-menu panel */}
       <div
-        className={`invisible absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 pt-3 opacity-0 transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100`}
+        className={`invisible absolute left-1/2 top-full z-50 -translate-x-1/2 pt-3 opacity-0 transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 ${
+          activeBrand ? "w-[480px]" : "w-48"
+        }`}
       >
-        <div className={`rounded-xl border py-2 shadow-lg ${panelClass}`}>
-          {item.children.map((child) => (
+        <div
+          className={`flex overflow-hidden rounded-xl border shadow-xl ${
+            isTransparentPanel
+              ? "border-white/15 bg-ink/98 shadow-black/40"
+              : "border-border bg-background shadow-black/10"
+          }`}
+        >
+          {/* Left column — brand list */}
+          <div
+            className={`flex w-44 flex-shrink-0 flex-col border-r py-2 ${
+              isTransparentPanel ? "border-white/10" : "border-border/60"
+            }`}
+          >
             <Link
-              key={child.href + child.label}
-              href={child.href}
-              className="block px-4 py-2 text-sm text-ink/80 transition-colors hover:bg-muted hover:text-ink"
+              href={item.href}
+              className={`mx-2 mb-1 rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                isTransparentPanel
+                  ? "text-emerald-400 hover:bg-white/10"
+                  : "text-brand hover:bg-muted"
+              }`}
             >
-              {child.label}
+              All {item.label}s →
             </Link>
-          ))}
+            {item.brands.map((brand) => (
+              <button
+                key={brand.href}
+                type="button"
+                onMouseEnter={() => setActiveBrand(brand)}
+                className={`mx-2 flex w-[calc(100%-1rem)] items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
+                  activeBrand?.label === brand.label
+                    ? isTransparentPanel
+                      ? "bg-white/10 text-white"
+                      : "bg-muted text-ink"
+                    : isTransparentPanel
+                      ? "text-white/75 hover:bg-white/8 hover:text-white"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-ink"
+                }`}
+              >
+                {brand.label}
+                <ChevronRight
+                  className={`size-3.5 transition-opacity ${
+                    activeBrand?.label === brand.label ? "opacity-60" : "opacity-20"
+                  }`}
+                />
+              </button>
+            ))}
+          </div>
+
+          {/* Right column — only shown when a brand is hovered */}
+          {activeBrand && (
+            <div className="flex flex-1 flex-col py-2">
+              <Link
+                href={activeBrand.href}
+                className={`mx-2 mb-1 rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                  isTransparentPanel
+                    ? "text-emerald-400 hover:bg-white/10"
+                    : "text-brand hover:bg-muted"
+                }`}
+              >
+                All {activeBrand.label} →
+              </Link>
+              {activeBrand.children.map((child) => (
+                <Link
+                  key={child.href + child.label}
+                  href={child.href}
+                  className={`mx-2 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                    isTransparentPanel
+                      ? "text-white/80 hover:bg-white/10 hover:text-white"
+                      : "text-muted-foreground hover:bg-muted hover:text-ink"
+                  }`}
+                >
+                  {child.label}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -52,6 +128,8 @@ export function SiteHeader() {
   const isHome = pathname === "/";
   const [isScrolled, setIsScrolled] = useState(!isHome);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openCategory, setOpenCategory] = useState<string | null>(null);
+  const [openBrand, setOpenBrand] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isHome) {
@@ -70,6 +148,8 @@ export function SiteHeader() {
 
   useEffect(() => {
     setMobileOpen(false);
+    setOpenCategory(null);
+    setOpenBrand(null);
   }, [pathname]);
 
   const isTransparent = isHome && !isScrolled;
@@ -83,7 +163,7 @@ export function SiteHeader() {
     ? "text-white/80 hover:text-white"
     : "text-muted-foreground hover:text-ink";
   const panelClass = isTransparent
-    ? "border-white/15 bg-ink/95 text-white shadow-black/30 [&_a]:text-white/85 [&_a:hover]:bg-white/10 [&_a:hover]:text-white"
+    ? "border-white/15 bg-ink/95 text-white shadow-black/30"
     : "border-border bg-background";
 
   return (
@@ -104,7 +184,7 @@ export function SiteHeader() {
             {ALL_PRODUCTS_LINK.label}
           </Link>
           {MAIN_NAV.map((item) => (
-            <NavDropdown
+            <MegaMenu
               key={item.href}
               item={item}
               linkClass={linkClass}
@@ -152,6 +232,7 @@ export function SiteHeader() {
         </div>
       </div>
 
+      {/* ── Mobile menu ── */}
       {mobileOpen ? (
         <div
           className={`border-t lg:hidden ${
@@ -167,27 +248,86 @@ export function SiteHeader() {
             >
               {ALL_PRODUCTS_LINK.label}
             </Link>
+
             {MAIN_NAV.map((item) => (
-              <div key={item.href} className="border-b border-current/10 py-2 last:border-0">
-                <Link
-                  href={item.href}
-                  className="block py-1.5 text-sm font-semibold"
-                >
-                  {item.label}
-                </Link>
-                <div className="mt-1 flex flex-col pl-2">
-                  {item.children.map((child) => (
-                    <Link
-                      key={child.href + child.label}
-                      href={child.href}
-                      className="py-1.5 text-sm opacity-80 transition-opacity hover:opacity-100"
-                    >
-                      {child.label}
-                    </Link>
-                  ))}
+              <div key={item.href} className="border-b border-current/10 last:border-0">
+                {/* Category row */}
+                <div className="flex items-center justify-between">
+                  <Link href={item.href} className="py-2.5 text-sm font-semibold">
+                    {item.label}
+                  </Link>
+                  <button
+                    type="button"
+                    aria-label={`Toggle ${item.label} brands`}
+                    onClick={() =>
+                      setOpenCategory(openCategory === item.href ? null : item.href)
+                    }
+                    className="p-2 opacity-70"
+                  >
+                    <ChevronDown
+                      className={`size-4 transition-transform ${
+                        openCategory === item.href ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
                 </div>
+
+                {/* Brands */}
+                {openCategory === item.href && (
+                  <div className="mb-2 ml-2 flex flex-col gap-0.5">
+                    {item.brands.map((brand) => (
+                      <div key={brand.href}>
+                        {/* Brand row */}
+                        <div className="flex items-center justify-between">
+                          <Link
+                            href={brand.href}
+                            className={`py-2 text-sm font-medium ${
+                              isTransparent ? "text-white/80" : "text-muted-foreground"
+                            }`}
+                          >
+                            {brand.label}
+                          </Link>
+                          <button
+                            type="button"
+                            aria-label={`Toggle ${brand.label} products`}
+                            onClick={() =>
+                              setOpenBrand(
+                                openBrand === brand.href ? null : brand.href,
+                              )
+                            }
+                            className="p-2 opacity-50"
+                          >
+                            <ChevronDown
+                              className={`size-3.5 transition-transform ${
+                                openBrand === brand.href ? "rotate-180" : ""
+                              }`}
+                            />
+                          </button>
+                        </div>
+
+                        {/* Sub-items */}
+                        {openBrand === brand.href && (
+                          <div className="mb-1 ml-3 flex flex-col gap-0.5">
+                            {brand.children.map((child) => (
+                              <Link
+                                key={child.href + child.label}
+                                href={child.href}
+                                className={`py-1.5 text-sm opacity-70 transition-opacity hover:opacity-100 ${
+                                  isTransparent ? "text-white" : "text-ink"
+                                }`}
+                              >
+                                {child.label}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
+
             <Link
               href="/quote"
               className="mt-2 py-2 text-sm font-medium sm:hidden"

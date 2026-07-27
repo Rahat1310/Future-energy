@@ -36,6 +36,7 @@ export const MOCK_CATEGORIES: MockCategory[] = [
     slug: "electric-motorcycles",
   },
   { id: "mock-cat-accessories", name: "Accessories", slug: "accessories" },
+  { id: "mock-cat-inverters", name: "Inverters", slug: "inverters" },
 ];
 
 export const MOCK_PRODUCTS: MockProduct[] = [
@@ -294,9 +295,9 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     description:
       "Clean, stable power for sensitive electronics — pairs with any lithium storage pack in the lineup.",
     category: {
-      id: "mock-cat-accessories",
-      name: "Accessories",
-      slug: "accessories",
+      id: "mock-cat-inverters",
+      name: "Inverters",
+      slug: "inverters",
     },
     variants: [
       {
@@ -312,6 +313,90 @@ export const MOCK_PRODUCTS: MockProduct[] = [
         price: 16500,
         stock: 12,
         attributes: { wattage: 2000, voltage: 24 },
+      },
+    ],
+  },
+  {
+    id: "mock-prod-ongrid-inverter",
+    name: "5kW On-Grid Solar Inverter",
+    slug: "5kw-on-grid-solar-inverter",
+    description:
+      "High-efficiency grid-tied inverter for maximizing ROI on residential solar arrays.",
+    category: {
+      id: "mock-cat-inverters",
+      name: "Inverters",
+      slug: "inverters",
+    },
+    variants: [
+      {
+        id: "mock-var-ongrid-5kw",
+        sku: "INV-ON-5KW",
+        price: 55000,
+        stock: 15,
+        attributes: { wattage: 5000, type: "on-grid", efficiency: 98.2 },
+      },
+    ],
+  },
+  {
+    id: "mock-prod-hybrid-inverter",
+    name: "8kW Hybrid Solar Inverter",
+    slug: "8kw-hybrid-solar-inverter",
+    description:
+      "Intelligent energy management for solar, battery, and grid power. Ensures uninterrupted power supply.",
+    category: {
+      id: "mock-cat-inverters",
+      name: "Inverters",
+      slug: "inverters",
+    },
+    variants: [
+      {
+        id: "mock-var-hybrid-8kw",
+        sku: "INV-HYB-8KW",
+        price: 95000,
+        stock: 8,
+        attributes: { wattage: 8000, type: "hybrid", efficiency: 97.6 },
+      },
+    ],
+  },
+  {
+    id: "mock-prod-microinverter",
+    name: "1kW Microinverter",
+    slug: "1kw-microinverter",
+    description:
+      "Panel-level optimization to minimize shading losses and improve system reliability.",
+    category: {
+      id: "mock-cat-inverters",
+      name: "Inverters",
+      slug: "inverters",
+    },
+    variants: [
+      {
+        id: "mock-var-micro-1kw",
+        sku: "INV-MIC-1KW",
+        price: 22000,
+        stock: 45,
+        attributes: { wattage: 1000, type: "microinverter", efficiency: 96.5 },
+      },
+    ],
+  },
+  {
+    id: "mock-prod-offgrid-inverter",
+    name: "3kW Off-Grid Inverter",
+    slug: "3kw-off-grid-inverter",
+    description:
+      "Robust off-grid solution for remote installations or complete energy independence.",
+    category: {
+      id: "mock-cat-inverters",
+      name: "Inverters",
+      slug: "inverters",
+    },
+    variants: [
+      {
+        id: "mock-var-offgrid-3kw",
+        sku: "INV-OFF-3KW",
+        price: 42000,
+        stock: 12,
+        attributes: { wattage: 3000, type: "off-grid", efficiency: 93.0 },
       },
     ],
   },

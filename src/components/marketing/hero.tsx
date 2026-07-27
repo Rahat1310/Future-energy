@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Leaf, Sun } from "lucide-react";
 import { ImpactCounter } from "@/components/marketing/impact-counter";
 import { MOCK_IMPACT_STATS } from "@/lib/impact-stats";
 
@@ -50,14 +51,27 @@ export function Hero({ headline, subhead }: HeroProps) {
           Powering the Future of Bangladesh
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
-          className="max-w-4xl text-5xl leading-tight text-white sm:text-6xl lg:text-7xl font-bold tracking-tight bg-clip-text"
-        >
-          {headline}
-        </motion.h1>
+        <h1 className="max-w-4xl text-5xl leading-tight sm:text-6xl lg:text-7xl font-bold tracking-tight flex flex-wrap justify-center gap-x-3 lg:gap-x-4 gap-y-2">
+          {headline.split(" ").map((word, i) => {
+            const cleanWord = word.toLowerCase().replace(/[^a-z]/g, "");
+            const isHighlight = ["power", "world", "earth"].includes(cleanWord);
+            return (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.1 + i * 0.12, ease: "easeOut" }}
+                className={
+                  isHighlight
+                    ? "text-transparent bg-clip-text bg-gradient-to-br from-emerald-300 to-emerald-600 drop-shadow-sm"
+                    : "text-white drop-shadow-sm"
+                }
+              >
+                {word}
+              </motion.span>
+            );
+          })}
+        </h1>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -95,8 +109,13 @@ export function Hero({ headline, subhead }: HeroProps) {
           transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
           className="mt-20 w-full"
         >
-          <div className="rounded-3xl border border-border/50 bg-white/40 dark:bg-black/20 backdrop-blur-xl p-8 shadow-xl shadow-brand/5">
-            <ImpactCounter {...MOCK_IMPACT_STATS} />
+          <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-white/40 dark:bg-black/20 backdrop-blur-xl p-8 shadow-xl shadow-brand/5">
+            <Leaf className="absolute -left-6 -bottom-8 h-40 w-40 text-brand/10 dark:text-brand/20 -rotate-12 pointer-events-none" />
+            <Sun className="absolute -right-6 -top-8 h-40 w-40 text-signal/10 dark:text-signal/20 rotate-12 pointer-events-none" />
+            
+            <div className="relative z-10">
+              <ImpactCounter {...MOCK_IMPACT_STATS} />
+            </div>
           </div>
         </motion.div>
       </div>

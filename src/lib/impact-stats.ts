@@ -1,6 +1,7 @@
 export type ImpactStats = {
   co2SavedKg: number;
   treesEquivalent: number;
+  homesPowered: number;
 };
 
 /**
@@ -16,4 +17,5 @@ export type ImpactStats = {
 export const MOCK_IMPACT_STATS: ImpactStats = {
   co2SavedKg: 128450,
   treesEquivalent: 5840,
+  homesPowered: 1250,
 };

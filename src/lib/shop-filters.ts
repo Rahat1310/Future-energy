@@ -56,6 +56,7 @@ export function attributeLabel(key: string): string {
     efficiency: "Efficiency",
     chemistry: "Chemistry",
     cellType: "Cell type",
+    type: "Type",
   };
   if (known[key]) return known[key];
   return key
@@ -149,6 +150,7 @@ export function inferAttributeFilters(
     "topSpeedKmph",
     "chemistry",
     "cellType",
+    "type",
     "efficiency",
     "cycleLife",
   ];

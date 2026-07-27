@@ -44,6 +44,13 @@ async function main() {
     },
   });
 
+  const inverters = await prisma.category.create({
+    data: {
+      name: "Inverters",
+      slug: "inverters",
+    },
+  });
+
   await prisma.product.create({
     data: {
       name: "48V Lithium Solar Storage Pack",
@@ -290,7 +297,7 @@ async function main() {
       slug: "pure-sine-wave-inverter",
       description:
         "Clean, stable power for sensitive electronics — pairs with any lithium storage pack in the lineup.",
-      categoryId: accessories.id,
+      categoryId: inverters.id,
       variants: {
         create: [
           {
@@ -310,6 +317,86 @@ async function main() {
               wattage: 2000,
               voltage: 24,
             },
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: "5kW On-Grid Solar Inverter",
+      slug: "5kw-on-grid-solar-inverter",
+      description:
+        "High-efficiency grid-tied inverter for maximizing ROI on residential solar arrays.",
+      categoryId: inverters.id,
+      variants: {
+        create: [
+          {
+            sku: "INV-ON-5KW",
+            price: 55000,
+            stock: 15,
+            attributes: { wattage: 5000, type: "on-grid", efficiency: 98.2 },
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: "8kW Hybrid Solar Inverter",
+      slug: "8kw-hybrid-solar-inverter",
+      description:
+        "Intelligent energy management for solar, battery, and grid power. Ensures uninterrupted power supply.",
+      categoryId: inverters.id,
+      variants: {
+        create: [
+          {
+            sku: "INV-HYB-8KW",
+            price: 95000,
+            stock: 8,
+            attributes: { wattage: 8000, type: "hybrid", efficiency: 97.6 },
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: "1kW Microinverter",
+      slug: "1kw-microinverter",
+      description:
+        "Panel-level optimization to minimize shading losses and improve system reliability.",
+      categoryId: inverters.id,
+      variants: {
+        create: [
+          {
+            sku: "INV-MIC-1KW",
+            price: 22000,
+            stock: 45,
+            attributes: { wattage: 1000, type: "microinverter", efficiency: 96.5 },
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: "3kW Off-Grid Inverter",
+      slug: "3kw-off-grid-inverter",
+      description:
+        "Robust off-grid solution for remote installations or complete energy independence.",
+      categoryId: inverters.id,
+      variants: {
+        create: [
+          {
+            sku: "INV-OFF-3KW",
+            price: 42000,
+            stock: 12,
+            attributes: { wattage: 3000, type: "off-grid", efficiency: 93.0 },
           },
         ],
       },

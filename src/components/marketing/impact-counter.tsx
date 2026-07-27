@@ -41,21 +41,22 @@ function useCountUp(target: number, durationMs = 1600) {
   return value;
 }
 
-export function ImpactCounter({ co2SavedKg, treesEquivalent }: ImpactStats) {
+export function ImpactCounter({ co2SavedKg, treesEquivalent, homesPowered }: ImpactStats) {
   const co2 = useCountUp(co2SavedKg);
   const trees = useCountUp(treesEquivalent);
+  const homes = useCountUp(homesPowered);
 
   return (
     <div
       role="status"
-      aria-label={`${co2SavedKg.toLocaleString("en-US")} kilograms of CO2 offset, equivalent to ${treesEquivalent.toLocaleString("en-US")} trees`}
-      className="mt-10 inline-flex flex-col gap-3 rounded-2xl border border-brand/20 bg-surface/80 px-6 py-4 sm:flex-row sm:items-center sm:gap-8"
+      aria-label={`${co2SavedKg.toLocaleString("en-US")} kilograms of CO2 emission reduced, equivalent to ${treesEquivalent.toLocaleString("en-US")} trees, and ${homesPowered.toLocaleString("en-US")} homes powered`}
+      className="inline-flex flex-col gap-3 rounded-2xl border border-brand/20 bg-surface/80 px-6 py-4 sm:flex-row sm:items-center sm:gap-8"
     >
       <div className="flex items-baseline gap-2">
         <span className="spec-number text-3xl text-brand sm:text-4xl">
           {co2.toLocaleString("en-US")}
         </span>
-        <span className="text-sm text-muted-foreground">kg CO₂ offset</span>
+        <span className="text-sm text-muted-foreground">kg CO₂ emission reduced</span>
       </div>
       <span className="hidden text-border sm:inline" aria-hidden>
         ·
@@ -65,6 +66,15 @@ export function ImpactCounter({ co2SavedKg, treesEquivalent }: ImpactStats) {
           {trees.toLocaleString("en-US")}
         </span>
         <span className="text-sm text-muted-foreground">trees-equivalent</span>
+      </div>
+      <span className="hidden text-border sm:inline" aria-hidden>
+        ·
+      </span>
+      <div className="flex items-baseline gap-2">
+        <span className="spec-number text-3xl text-brand sm:text-4xl">
+          {homes.toLocaleString("en-US")}
+        </span>
+        <span className="text-sm text-muted-foreground">homes powered</span>
       </div>
     </div>
   );
