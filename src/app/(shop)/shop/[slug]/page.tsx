@@ -10,6 +10,14 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
+/**
+ * ISR: category listing — 5 min.
+ * Note: `searchParams` (filters/sort) may still opt this route into dynamic
+ * rendering in App Router; revalidate still caps freshness when a static
+ * shell is served, and admin stock edits call revalidatePath/tag.
+ */
+export const revalidate = 300;
+
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);

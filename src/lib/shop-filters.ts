@@ -280,7 +280,9 @@ export function parseSearchQuery(
 ): string {
   const raw = searchParams.q;
   const value = Array.isArray(raw) ? raw[0] : raw;
-  return value?.trim() ?? "";
+  const trimmed = value?.trim() ?? "";
+  // Cap length client-path too — server searchProducts also validates via Zod.
+  return trimmed.slice(0, 100);
 }
 
 /** Text + optional category slug pre-filter before attribute filters. */

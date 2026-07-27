@@ -9,6 +9,13 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
+/**
+ * ISR: full catalog — 5 min (same as category pages).
+ * Filter/search query strings can force dynamic rendering; admin edits
+ * also invalidate via revalidatePath('/shop') + tags.
+ */
+export const revalidate = 300;
+
 export const metadata = {
   title: "All products | Future Energy BD",
   description:

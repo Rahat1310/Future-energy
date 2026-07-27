@@ -1,11 +1,10 @@
+import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import { getKeySpec } from "@/lib/catalog";
 import {
   getMockFeaturedProducts,
   MOCK_CATEGORIES,
 } from "@/lib/mock-catalog";
-import { sanityFetch, type BlogPost, type HomePage } from "@/lib/sanity";
-import { HOME_PAGE_QUERY, LATEST_BLOG_POSTS_QUERY } from "@/sanity/queries";
 
 export type NavCategory = {
   id: string;
@@ -22,37 +21,23 @@ export type FeaturedProduct = {
   keySpec: string | null;
 };
 
-type HeroContent = Pick<HomePage, "heroHeadline" | "heroSubhead">;
+export type HeroContent = {
+  heroHeadline: string;
+  heroSubhead: string;
+};
 
-/** Shown until an editor publishes the Sanity `homePage` document. */
-const FALLBACK_HERO_CONTENT: HeroContent = {
+/** Static homepage hero copy (edit here or move to env later). */
+const HERO_CONTENT: HeroContent = {
   heroHeadline: "Power your world without costing the earth",
   heroSubhead:
     "Lithium batteries, solar panels, and electric motorcycles for Bangladesh — built to cut bills and cut carbon.",
 };
 
 export async function getHeroContent(): Promise<HeroContent> {
-  try {
-    const doc = await sanityFetch<HomePage | null>({
-      query: HOME_PAGE_QUERY,
-      tags: ["homePage"],
-    });
-
-    return {
-      heroHeadline: doc?.heroHeadline || FALLBACK_HERO_CONTENT.heroHeadline,
-      heroSubhead: doc?.heroSubhead || FALLBACK_HERO_CONTENT.heroSubhead,
-    };
-  } catch (error) {
-    console.warn(
-      "[homepage] Sanity homePage fetch failed, using placeholder copy:",
-      error,
-    );
-    return FALLBACK_HERO_CONTENT;
-  }
+  return HERO_CONTENT;
 }
 
-/** Top-level categories only — subcategories (via parentId) stay off the homepage strip. */
-export async function getTopLevelCategories(): Promise<NavCategory[]> {
+async function fetchTopLevelCategories(): Promise<NavCategory[]> {
   try {
     const categories = await db.category.findMany({
       where: { parentId: null },
@@ -67,7 +52,17 @@ export async function getTopLevelCategories(): Promise<NavCategory[]> {
   }
 }
 
-export async function getFeaturedProducts(): Promise<FeaturedProduct[]> {
+/**
+ * Cached category strip for the homepage. Invalidated via `revalidateTag('categories')`
+ * from admin mutations (and page-level ISR at 600s as a safety net).
+ */
+export const getTopLevelCategories = unstable_cache(
+  fetchTopLevelCategories,
+  ["homepage-top-categories"],
+  { tags: ["categories", "homepage"], revalidate: 600 },
+);
+
+async function fetchFeaturedProducts(): Promise<FeaturedProduct[]> {
   try {
     const products = await db.product.findMany({
       take: 8,
@@ -106,14 +101,12 @@ export async function getFeaturedProducts(): Promise<FeaturedProduct[]> {
   }
 }
 
-export async function getLatestBlogPosts(): Promise<BlogPost[]> {
-  try {
-    return await sanityFetch<BlogPost[]>({
-      query: LATEST_BLOG_POSTS_QUERY,
-      tags: ["blogPost"],
-    });
-  } catch (error) {
-    console.warn("[homepage] Sanity blogPost fetch failed:", error);
-    return [];
-  }
-}
+/**
+ * Cached featured products for the homepage. Invalidated via
+ * `revalidateTag('homepage' | 'products')` when stock/price changes in admin.
+ */
+export const getFeaturedProducts = unstable_cache(
+  fetchFeaturedProducts,
+  ["homepage-featured-products"],
+  { tags: ["homepage", "products"], revalidate: 600 },
+);

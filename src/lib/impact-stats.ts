@@ -1,21 +1,14 @@
-export type ImpactStats = {
-  co2SavedKg: number;
-  treesEquivalent: number;
-  homesPowered: number;
-};
-
 /**
- * TODO(build order #8 — see project.md): these totals are mocked. Replace
- * with a real aggregation over completed Orders/OrderItems (e.g. sum a
- * per-unit CO2-offset figure derived from each ProductVariant's attributes)
- * once the solar savings calculator ships.
- *
- * Kept in a plain (non "use client") module deliberately: Server Components
- * can only resolve component references from "use client" files, not plain
- * data exports, so this constant lives here instead of in impact-counter.tsx.
+ * @deprecated Prefer `@/lib/impact` — Redis-backed totals for the homepage.
+ * Kept briefly so any leftover imports still typecheck during the cutover.
  */
+export type { ImpactStats } from "@/lib/impact";
+
+import type { ImpactStats } from "@/lib/impact";
+
+/** @deprecated Mocked totals — homepage now reads Redis via getImpactStats(). */
 export const MOCK_IMPACT_STATS: ImpactStats = {
-  co2SavedKg: 128450,
-  treesEquivalent: 5840,
-  homesPowered: 1250,
+  co2SavedKg: 0,
+  treesEquivalent: 0,
+  homesPowered: 0,
 };

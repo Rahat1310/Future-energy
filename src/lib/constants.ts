@@ -6,3 +6,11 @@ export const LOW_STOCK_THRESHOLD = 5;
 
 /** Shown on the post-checkout payment page for manual bKash/Nagad confirmation. */
 export const PAYMENT_CONFIRMATION_HOURS = 24;
+
+/**
+ * Public support inbox — shown site-wide and receives quote/order notifications.
+ * Override with NEXT_PUBLIC_SUPPORT_EMAIL if needed.
+ */
+export const SUPPORT_EMAIL =
+  process.env.NEXT_PUBLIC_SUPPORT_EMAIL?.trim() ||
+  "support@futureenergybd.com";

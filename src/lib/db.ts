@@ -1,14 +1,22 @@
-import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "@/generated/prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
   db: PrismaClient | undefined;
 };
 
+/**
+ * Neon serverless adapter over the *pooled* DATABASE_URL (PgBouncer / `-pooler`
+ * host). Prisma CLI migrations use DIRECT_URL via prisma.config.ts instead —
+ * migrate/push need a direct TCP connection, not the pooler.
+ */
 function createPrismaClient() {
-  const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL!,
-  });
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL is not set");
+  }
+
+  const adapter = new PrismaNeon({ connectionString });
   return new PrismaClient({ adapter });
 }
 

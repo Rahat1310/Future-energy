@@ -3,6 +3,14 @@
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
+import { notifySupportOfOrder } from "@/lib/email";
+import { enforceMutationRateLimit } from "@/lib/ratelimit";
+import {
+  createOrderSchema,
+  firstZodError,
+  isHoneypotTriggered,
+  submitPaymentNoteSchema,
+} from "@/lib/validation";
 
 export type CheckoutCartLine = {
   variantId: string;
@@ -17,40 +25,48 @@ export type CreateOrderInput = {
   deliveryPhone: string;
   deliveryAddress: string;
   deliveryCity: string;
+  /** Honeypot — leave empty. */
+  website?: string;
 };
 
 export type CreateOrderResult =
   | { ok: true; orderId: string }
-  | { ok: false; error: string };
+  | { ok: false; error: string; status?: 429 };
 
 export async function createOrderFromCart(
   input: CreateOrderInput,
 ): Promise<CreateOrderResult> {
+  const limited = await enforceMutationRateLimit("checkout");
+  if (!limited.ok) {
+    return { ok: false, error: limited.error, status: 429 };
+  }
+
   const { userId } = await auth();
   if (!userId) {
     return { ok: false, error: "You must be signed in to checkout." };
   }
 
-  const deliveryName = input.deliveryName.trim();
-  const deliveryPhone = input.deliveryPhone.trim();
-  const deliveryAddress = input.deliveryAddress.trim();
-  const deliveryCity = input.deliveryCity.trim();
-
-  if (!deliveryName || !deliveryPhone || !deliveryAddress || !deliveryCity) {
-    return { ok: false, error: "Please fill in all delivery fields." };
+  const parsed = createOrderSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: firstZodError(parsed.error) };
   }
 
-  if (!input.items.length) {
-    return { ok: false, error: "Your cart is empty." };
+  const data = parsed.data;
+
+  // Silently accept bots — look successful, create nothing.
+  if (isHoneypotTriggered(data.website)) {
+    return { ok: true, orderId: "received" };
   }
 
-  for (const line of input.items) {
-    if (!line.variantId || line.quantity < 1 || line.price < 0) {
-      return { ok: false, error: "Cart contains an invalid line item." };
-    }
-  }
+  const {
+    deliveryName,
+    deliveryPhone,
+    deliveryAddress,
+    deliveryCity,
+    items,
+  } = data;
 
-  const variantIds = input.items.map((line) => line.variantId);
+  const variantIds = items.map((line) => line.variantId);
   const variants = await db.productVariant.findMany({
     where: { id: { in: variantIds } },
     select: { id: true, stock: true },
@@ -64,7 +80,7 @@ export async function createOrderFromCart(
   }
 
   const stockById = new Map(variants.map((v) => [v.id, v.stock]));
-  for (const line of input.items) {
+  for (const line of items) {
     const stock = stockById.get(line.variantId) ?? 0;
     if (stock < line.quantity) {
       return {
@@ -74,7 +90,7 @@ export async function createOrderFromCart(
     }
   }
 
-  const total = input.items.reduce(
+  const total = items.reduce(
     (sum, line) => sum + line.price * line.quantity,
     0,
   );
@@ -89,7 +105,7 @@ export async function createOrderFromCart(
       deliveryAddress,
       deliveryCity,
       items: {
-        create: input.items.map((line) => ({
+        create: items.map((line) => ({
           variantId: line.variantId,
           quantity: line.quantity,
           price: line.price,
@@ -97,6 +113,17 @@ export async function createOrderFromCart(
       },
     },
     select: { id: true },
+  });
+
+  await notifySupportOfOrder({
+    orderId: order.id,
+    deliveryName,
+    deliveryPhone,
+    deliveryAddress,
+    deliveryCity,
+    total,
+    itemCount: items.reduce((sum, line) => sum + line.quantity, 0),
+    lines: items,
   });
 
   revalidatePath(`/orders/${order.id}/payment`);
@@ -119,13 +146,16 @@ export async function submitPaymentNote(
     return { ok: false, error: "You must be signed in." };
   }
 
-  const note = transactionId.trim();
-  if (!note) {
-    return { ok: false, error: "Enter the transaction ID from bKash or Nagad." };
+  const parsed = submitPaymentNoteSchema.safeParse({ orderId, transactionId });
+  if (!parsed.success) {
+    return { ok: false, error: firstZodError(parsed.error) };
   }
 
+  const note = parsed.data.transactionId;
+  const id = parsed.data.orderId;
+
   const order = await db.order.findUnique({
-    where: { id: orderId },
+    where: { id },
     select: { userId: true, paymentStatus: true },
   });
 
@@ -138,15 +168,15 @@ export async function submitPaymentNote(
   }
 
   await db.order.update({
-    where: { id: orderId },
+    where: { id },
     data: {
       paymentNote: note,
       // Intentionally leave paymentStatus as PENDING — admin confirms manually.
     },
   });
 
-  revalidatePath(`/orders/${orderId}/payment`);
-  revalidatePath(`/orders/${orderId}`);
+  revalidatePath(`/orders/${id}/payment`);
+  revalidatePath(`/orders/${id}`);
   revalidatePath("/orders");
   return { ok: true };
 }

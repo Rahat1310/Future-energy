@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { MapPin, MessageCircle, Phone, ShieldCheck } from "lucide-react";
+import { Mail, MapPin, MessageCircle, Phone, ShieldCheck } from "lucide-react";
+import { SUPPORT_EMAIL } from "@/lib/constants";
 import { ALL_PRODUCTS_LINK, MAIN_NAV } from "@/lib/nav";
 
 function whatsappHref() {
@@ -12,6 +13,7 @@ function whatsappHref() {
 export function SiteFooter() {
   const wa = whatsappHref();
   const year = new Date().getFullYear();
+  const mailto = `mailto:${SUPPORT_EMAIL}`;
 
   return (
     <footer className="relative overflow-hidden border-t border-ink/10 bg-ink text-white">
@@ -131,6 +133,15 @@ export function SiteFooter() {
               Contact &amp; pay
             </h3>
             <ul className="mt-4 flex flex-col gap-3 text-sm">
+              <li>
+                <a
+                  href={mailto}
+                  className="inline-flex items-center gap-2 text-white/90 transition-colors hover:text-signal"
+                >
+                  <Mail className="size-4 text-brand" />
+                  {SUPPORT_EMAIL}
+                </a>
+              </li>
               {wa ? (
                 <li>
                   <a

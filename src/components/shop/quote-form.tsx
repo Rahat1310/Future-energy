@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { HoneypotField } from "@/components/ui/honeypot-field";
 import { createInquiry } from "@/lib/inquiries";
 
 type QuoteTarget = {
@@ -24,6 +25,7 @@ export function QuoteForm({
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState(initialMessage);
+  const [website, setWebsite] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -40,6 +42,7 @@ export function QuoteForm({
         message: message || undefined,
         productId: target.productId,
         variantId: target.variantId,
+        website,
       });
 
       if (!result.ok) {
@@ -111,8 +114,9 @@ export function QuoteForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="rounded-2xl border border-border bg-surface p-6 sm:p-8"
+      className="relative rounded-2xl border border-border bg-surface p-6 sm:p-8"
     >
+      <HoneypotField value={website} onChange={setWebsite} />
       {target.productName ? (
         <div className="mb-6 rounded-xl border border-border bg-background px-4 py-3 text-sm">
           <p className="text-muted-foreground">Quoting for</p>

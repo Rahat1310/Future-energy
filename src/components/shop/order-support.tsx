@@ -1,5 +1,6 @@
-import { MessageCircle, Phone } from "lucide-react";
+import { Mail, MessageCircle, Phone } from "lucide-react";
 import Link from "next/link";
+import { SUPPORT_EMAIL } from "@/lib/constants";
 
 type OrderSupportProps = {
   orderId: string;
@@ -17,6 +18,11 @@ function whatsappHref(orderId: string) {
 
 export function OrderSupport({ orderId }: OrderSupportProps) {
   const wa = whatsappHref(orderId);
+  const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
+    `Help with order ${orderId}`,
+  )}&body=${encodeURIComponent(
+    `Hi Future Energy BD,\n\nI need help with order ${orderId}.\n\n`,
+  )}`;
 
   return (
     <section className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
@@ -30,7 +36,7 @@ export function OrderSupport({ orderId }: OrderSupportProps) {
       <p className="spec-number mt-3 text-xs text-muted-foreground">
         Order ID: {orderId}
       </p>
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         {wa ? (
           <a
             href={wa}
@@ -47,6 +53,13 @@ export function OrderSupport({ orderId }: OrderSupportProps) {
             WhatsApp number not configured yet
           </span>
         )}
+        <a
+          href={mailto}
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border px-4 text-sm font-medium text-ink transition-colors hover:bg-muted"
+        >
+          <Mail className="size-4 text-brand" />
+          Email {SUPPORT_EMAIL}
+        </a>
         <Link
           href={`/quote?message=${encodeURIComponent(`Issue with order ${orderId}`)}`}
           className="inline-flex h-11 items-center justify-center rounded-lg border border-border px-4 text-sm font-medium text-ink transition-colors hover:bg-muted"

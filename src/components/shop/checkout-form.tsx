@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart/cart-context";
 import { Button } from "@/components/ui/button";
+import { HoneypotField } from "@/components/ui/honeypot-field";
 import { formatPrice } from "@/lib/catalog";
 import { createOrderFromCart } from "@/lib/orders";
 
@@ -20,6 +21,7 @@ export function CheckoutForm() {
   const [deliveryPhone, setDeliveryPhone] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [deliveryCity, setDeliveryCity] = useState("");
+  const [website, setWebsite] = useState("");
 
   useEffect(() => {
     if (itemCount === 0 && !redirectingTo && !pending) {
@@ -56,6 +58,7 @@ export function CheckoutForm() {
         deliveryPhone,
         deliveryAddress,
         deliveryCity,
+        website,
         items: items.map((item) => ({
           variantId: item.variantId,
           quantity: item.quantity,
@@ -78,8 +81,9 @@ export function CheckoutForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="grid gap-10 lg:grid-cols-[1fr_22rem] lg:items-start"
+      className="relative grid gap-10 lg:grid-cols-[1fr_22rem] lg:items-start"
     >
+      <HoneypotField value={website} onChange={setWebsite} />
       <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
         <h2 className="font-display text-lg font-medium text-ink">
           Delivery details

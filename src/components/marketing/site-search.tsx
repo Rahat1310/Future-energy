@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -10,12 +10,16 @@ type SiteSearchProps = {
   light?: boolean;
 };
 
+const SEARCH_DEBOUNCE_MS = 400;
+
 export function SiteSearch({ light = false }: SiteSearchProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setQuery(searchParams.get("q") ?? "");
@@ -27,12 +31,41 @@ export function SiteSearch({ light = false }: SiteSearchProps) {
     }
   }, [open]);
 
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
+  function navigateToSearch(raw: string) {
+    const q = raw.trim();
+    if (!q) {
+      if (pathname === "/search") {
+        router.push("/search");
+      }
+      return;
+    }
+    router.push(`/search?q=${encodeURIComponent(q)}`);
+  }
+
+  function onQueryChange(next: string) {
+    setQuery(next);
+    // Debounce navigation only while already on /search so homepage typing
+    // never triggers a route change mid-keystroke. Submit still fires immediately.
+    if (pathname !== "/search") return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      navigateToSearch(next);
+    }, SEARCH_DEBOUNCE_MS);
+  }
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     const q = query.trim();
     if (!q) return;
     setOpen(false);
-    router.push(`/search?q=${encodeURIComponent(q)}`);
+    navigateToSearch(q);
   }
 
   return (
@@ -54,7 +87,7 @@ export function SiteSearch({ light = false }: SiteSearchProps) {
           type="search"
           name="q"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => onQueryChange(event.target.value)}
           placeholder="Search products…"
           aria-label="Search products"
           className={cn(
@@ -79,7 +112,7 @@ export function SiteSearch({ light = false }: SiteSearchProps) {
               type="search"
               name="q"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => onQueryChange(event.target.value)}
               placeholder="Search…"
               aria-label="Search products"
               className="h-9 w-[min(70vw,16rem)] rounded-md bg-transparent px-2 text-sm text-ink outline-none"

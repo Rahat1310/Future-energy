@@ -2,8 +2,12 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
+// Seed / CLI scripts prefer the direct (non-pooled) Neon URL.
+const connectionString =
+  process.env.DIRECT_URL ?? process.env.DATABASE_URL!;
+
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL!,
+  connectionString,
 });
 const prisma = new PrismaClient({ adapter });
 

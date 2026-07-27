@@ -6,6 +6,9 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+/** ISR: product detail — 5 min. Stock updates also revalidatePath/tag from admin. */
+export const revalidate = 300;
+
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);

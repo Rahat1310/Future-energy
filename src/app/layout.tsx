@@ -3,7 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { IBM_Plex_Sans, IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { WhatsAppButton } from "@/components/marketing/whatsapp-button";
+import { DeferredWhatsAppButton } from "@/components/marketing/deferred-whatsapp-button";
 import { Providers } from "@/components/providers";
 import { EnergyBackground } from "@/components/ui/energy-background";
 import { clerkAppearance } from "@/lib/clerk-appearance";
@@ -13,17 +13,20 @@ const ibmPlexSans = IBM_Plex_Sans({
   variable: "--font-ibm-plex-sans",
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
+  display: "swap",
 });
 
 const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-ibm-plex-mono",
   weight: ["400", "500", "600"],
   subsets: ["latin"],
+  display: "swap",
 });
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -46,7 +49,7 @@ export default function RootLayout({
           <EnergyBackground />
           <Providers>
             {children}
-            <WhatsAppButton />
+            <DeferredWhatsAppButton />
           </Providers>
           <Analytics />
           <SpeedInsights />

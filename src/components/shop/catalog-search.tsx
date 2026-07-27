@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 
@@ -8,15 +8,24 @@ type CatalogSearchProps = {
   initialQuery?: string;
 };
 
+const SEARCH_DEBOUNCE_MS = 400;
+
 export function CatalogSearch({ initialQuery = "" }: CatalogSearchProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(initialQuery);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setQuery(searchParams.get("q") ?? "");
   }, [searchParams]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
 
   function pushQuery(next: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -30,12 +39,22 @@ export function CatalogSearch({ initialQuery = "" }: CatalogSearchProps) {
     router.push(qs ? `${pathname}?${qs}` : pathname);
   }
 
+  function onQueryChange(next: string) {
+    setQuery(next);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      pushQuery(next);
+    }, SEARCH_DEBOUNCE_MS);
+  }
+
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     pushQuery(query);
   }
 
   function clear() {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     setQuery("");
     pushQuery("");
   }
@@ -50,7 +69,7 @@ export function CatalogSearch({ initialQuery = "" }: CatalogSearchProps) {
         type="search"
         name="q"
         value={query}
-        onChange={(event) => setQuery(event.target.value)}
+        onChange={(event) => onQueryChange(event.target.value)}
         placeholder="Search this catalog…"
         aria-label="Search catalog"
         className="h-11 w-full rounded-xl border border-border bg-surface py-2 pr-10 pl-10 text-sm text-ink outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"

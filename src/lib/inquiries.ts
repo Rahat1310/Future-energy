@@ -1,6 +1,13 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { notifySupportOfQuote } from "@/lib/email";
+import { enforceMutationRateLimit } from "@/lib/ratelimit";
+import {
+  createInquirySchema,
+  firstZodError,
+  isHoneypotTriggered,
+} from "@/lib/validation";
 
 export type CreateInquiryInput = {
   name: string;
@@ -9,44 +16,59 @@ export type CreateInquiryInput = {
   message?: string;
   productId?: string | null;
   variantId?: string | null;
+  /** Honeypot — leave empty. */
+  website?: string;
 };
 
 export type CreateInquiryResult =
   | { ok: true; inquiryId: string }
-  | { ok: false; error: string };
+  | { ok: false; error: string; status?: 429 };
 
 export async function createInquiry(
   input: CreateInquiryInput,
 ): Promise<CreateInquiryResult> {
-  const name = input.name.trim();
-  const phone = input.phone.trim();
-  const email = input.email?.trim() || null;
-  const message = input.message?.trim() || null;
-  const productId = input.productId?.trim() || null;
-  const variantId = input.variantId?.trim() || null;
-
-  if (!name || !phone) {
-    return { ok: false, error: "Name and phone are required." };
+  const limited = await enforceMutationRateLimit("inquiry");
+  if (!limited.ok) {
+    return { ok: false, error: limited.error, status: 429 };
   }
 
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { ok: false, error: "Enter a valid email address." };
+  const parsed = createInquirySchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: firstZodError(parsed.error) };
   }
+
+  const data = parsed.data;
+
+  // Silently accept bots — look successful, create nothing.
+  if (isHoneypotTriggered(data.website)) {
+    return { ok: true, inquiryId: "received" };
+  }
+
+  const name = data.name;
+  const phone = data.phone;
+  const email = data.email ?? null;
+  const message = data.message ?? null;
+  const productId = data.productId;
+  const variantId = data.variantId;
+
+  let productName: string | null = null;
+  let variantSku: string | null = null;
 
   if (productId) {
     const product = await db.product.findUnique({
       where: { id: productId },
-      select: { id: true },
+      select: { id: true, name: true },
     });
     if (!product) {
       return { ok: false, error: "The selected product was not found." };
     }
+    productName = product.name;
   }
 
   if (variantId) {
     const variant = await db.productVariant.findUnique({
       where: { id: variantId },
-      select: { id: true, productId: true },
+      select: { id: true, productId: true, sku: true },
     });
     if (!variant) {
       return { ok: false, error: "The selected variant was not found." };
@@ -56,6 +78,15 @@ export async function createInquiry(
         ok: false,
         error: "That variant does not belong to the selected product.",
       };
+    }
+    variantSku = variant.sku;
+
+    if (!productName) {
+      const product = await db.product.findUnique({
+        where: { id: variant.productId },
+        select: { name: true },
+      });
+      productName = product?.name ?? null;
     }
   }
 
@@ -70,6 +101,16 @@ export async function createInquiry(
       status: "NEW",
     },
     select: { id: true },
+  });
+
+  await notifySupportOfQuote({
+    inquiryId: inquiry.id,
+    name,
+    phone,
+    email,
+    message,
+    productName,
+    variantSku,
   });
 
   return { ok: true, inquiryId: inquiry.id };

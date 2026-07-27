@@ -1,3 +1,5 @@
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import { getKeySpec } from "@/lib/catalog";
 import { MOCK_CATEGORIES, MOCK_PRODUCTS } from "@/lib/mock-catalog";
@@ -105,7 +107,7 @@ function getMockFilterableCatalog(): FilterableProduct[] {
   }));
 }
 
-async function loadFilterableCatalog(): Promise<FilterableProduct[]> {
+async function fetchFilterableCatalog(): Promise<FilterableProduct[]> {
   try {
     const rows = await db.product.findMany({
       orderBy: { name: "asc" },
@@ -147,6 +149,13 @@ async function loadFilterableCatalog(): Promise<FilterableProduct[]> {
 
   return getMockFilterableCatalog();
 }
+
+/** Cross-request cache; invalidated via `revalidateTag('products'|'categories')`. */
+const loadFilterableCatalog = unstable_cache(
+  fetchFilterableCatalog,
+  ["filterable-catalog"],
+  { tags: ["products", "categories"], revalidate: 300 },
+);
 
 /** Full catalog for /shop — search, category + attribute filters, sort. */
 export async function getCatalogListing(
@@ -212,7 +221,7 @@ export async function getAllProducts(): Promise<ListedProduct[]> {
   return listing.products;
 }
 
-export async function getCategoryBySlug(slug: string) {
+async function fetchCategoryBySlug(slug: string) {
   try {
     const category = await db.category.findUnique({
       where: { slug },
@@ -225,44 +234,69 @@ export async function getCategoryBySlug(slug: string) {
   return MOCK_CATEGORIES.find((c) => c.slug === slug) ?? null;
 }
 
+/**
+ * Cross-request tagged cache + per-request React.cache so generateMetadata
+ * and getCategoryListing share one category lookup per request.
+ * Invalidated with `revalidateTag('categories')`.
+ */
+export const getCategoryBySlug = cache(async (slug: string) => {
+  return unstable_cache(
+    () => fetchCategoryBySlug(slug),
+    ["category-by-slug", slug],
+    { tags: ["categories"], revalidate: 600 },
+  )();
+});
+
+async function fetchCategoryProducts(
+  categoryId: string,
+): Promise<FilterableProduct[]> {
+  const rows = await db.product.findMany({
+    where: { categoryId },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      variants: {
+        select: {
+          price: true,
+          attributes: true,
+        },
+      },
+    },
+  });
+
+  return rows.map((product) => ({
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    idSortKey: product.id,
+    variants: product.variants.map((v) => ({
+      price: Number(v.price),
+      attributes: v.attributes,
+    })),
+  }));
+}
+
+/** Tagged product list for a category; invalidated with products/categories tags. */
+function getCachedCategoryProducts(categoryId: string, slug: string) {
+  return unstable_cache(
+    () => fetchCategoryProducts(categoryId),
+    ["category-products", slug],
+    { tags: ["products", "categories"], revalidate: 300 },
+  )();
+}
+
 export async function getCategoryListing(
   slug: string,
   searchParams: Record<string, string | string[] | undefined>,
 ): Promise<CategoryListing | null> {
   try {
-    const category = await db.category.findUnique({
-      where: { slug },
-      select: { id: true, name: true, slug: true },
-    });
+    const category = await getCategoryBySlug(slug);
 
     if (category) {
-      const rows = await db.product.findMany({
-        where: { categoryId: category.id },
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          variants: {
-            select: {
-              price: true,
-              attributes: true,
-            },
-          },
-        },
-      });
+      const filterable = await getCachedCategoryProducts(category.id, slug);
 
-      if (rows.length > 0) {
-        const filterable: FilterableProduct[] = rows.map((product) => ({
-          id: product.id,
-          name: product.name,
-          slug: product.slug,
-          idSortKey: product.id,
-          variants: product.variants.map((v) => ({
-            price: Number(v.price),
-            attributes: v.attributes,
-          })),
-        }));
-
+      if (filterable.length > 0) {
         return buildListing(category, filterable, searchParams);
       }
     }

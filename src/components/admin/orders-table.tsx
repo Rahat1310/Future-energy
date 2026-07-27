@@ -10,6 +10,8 @@ export type AdminOrderRow = {
   id: string;
   deliveryName: string;
   deliveryPhone: string;
+  deliveryAddress: string;
+  deliveryCity: string;
   total: number;
   paymentStatus: PaymentStatus;
   paymentNote: string | null;
@@ -28,6 +30,7 @@ export function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
           <tr>
             <th className="px-3 py-2 font-medium">Order</th>
             <th className="px-3 py-2 font-medium">Customer</th>
+            <th className="px-3 py-2 font-medium">Delivery</th>
             <th className="px-3 py-2 font-medium">Total</th>
             <th className="px-3 py-2 font-medium">Status</th>
             <th className="px-3 py-2 font-medium">Txn ID</th>
@@ -46,6 +49,14 @@ export function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
                 </div>
                 <div className="font-mono text-xs text-neutral-500">
                   {order.deliveryPhone}
+                </div>
+              </td>
+              <td className="px-3 py-2 text-neutral-700">
+                <div className="max-w-[14rem] text-xs leading-snug">
+                  {order.deliveryAddress}
+                </div>
+                <div className="mt-0.5 text-xs text-neutral-500">
+                  {order.deliveryCity}
                 </div>
               </td>
               <td className="px-3 py-2 font-mono text-neutral-800">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { ImpactStats } from "@/lib/impact-stats";
+import type { ImpactStats } from "@/lib/impact";
 
 function useCountUp(target: number, durationMs = 1600) {
   const [value, setValue] = useState(0);

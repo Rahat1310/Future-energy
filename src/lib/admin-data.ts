@@ -7,6 +7,8 @@ export async function getAdminOrders() {
       id: true,
       deliveryName: true,
       deliveryPhone: true,
+      deliveryAddress: true,
+      deliveryCity: true,
       total: true,
       paymentStatus: true,
       paymentNote: true,

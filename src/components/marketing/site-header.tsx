@@ -5,11 +5,26 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { UserButton, useAuth, useUser } from "@clerk/nextjs";
 import { ChevronDown, ChevronRight, Menu, X } from "lucide-react";
+import dynamic from "next/dynamic";
 import { AccountLinks } from "@/components/marketing/account-links";
 import { CartButton } from "@/components/cart/cart-button";
-import { SiteSearch } from "@/components/marketing/site-search";
 import { Button } from "@/components/ui/button";
 import { ALL_PRODUCTS_LINK, MAIN_NAV, type NavBrand, type NavItem } from "@/lib/nav";
+
+/** Search is interactive chrome — load after first paint; reserve desktop width to avoid CLS. */
+const SiteSearch = dynamic(
+  () =>
+    import("@/components/marketing/site-search").then((mod) => mod.SiteSearch),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="hidden h-9 w-44 sm:block md:w-52"
+        aria-hidden
+      />
+    ),
+  },
+);
 
 /** Two-column mega-menu: left = brands, right = sub-items for hovered brand */
 function MegaMenu({
