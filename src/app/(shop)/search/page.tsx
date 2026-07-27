@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ProductCard } from "@/components/shop/product-card";
+import { ProductGrid } from "@/components/shop/product-grid";
 import { searchProducts } from "@/lib/search";
 
 type PageProps = {
@@ -48,11 +48,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
           description={`Nothing matched “${query}”. Browse categories or try a different term.`}
         />
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
-          {results.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <ProductGrid products={results} />
       )}
     </div>
   );

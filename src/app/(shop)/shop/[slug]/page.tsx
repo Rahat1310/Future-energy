@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { FilterSidebar } from "@/components/shop/filter-sidebar";
-import { ProductCard } from "@/components/shop/product-card";
+import { ProductGrid } from "@/components/shop/product-grid";
 import { SortControl } from "@/components/shop/sort-control";
 import { getCategoryBySlug, getCategoryListing } from "@/lib/shop-data";
 
@@ -81,11 +81,7 @@ export default async function CategoryShopPage({
               description="No products match the selected filters. Try clearing a filter or widening the range."
             />
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <ProductGrid products={products} />
           )}
         </div>
       </div>

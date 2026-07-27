@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { CatalogSearch } from "@/components/shop/catalog-search";
 import { FilterSidebar } from "@/components/shop/filter-sidebar";
-import { ProductCard } from "@/components/shop/product-card";
+import { ProductGrid } from "@/components/shop/product-grid";
 import { SortControl } from "@/components/shop/sort-control";
 import { getCatalogListing } from "@/lib/shop-data";
 
@@ -93,11 +93,7 @@ export default async function ShopCatalogPage({ searchParams }: PageProps) {
               description="Nothing matched your search or filters. Try clearing filters or a different keyword."
             />
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <ProductGrid products={products} />
           )}
         </div>
       </div>
