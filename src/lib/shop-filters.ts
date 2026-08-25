@@ -98,9 +98,13 @@ export function inferAttributeFilters(
   const numericValues = new Map<string, number[]>();
   const stringValues = new Map<string, Set<string>>();
 
+  const IGNORED_KEYS = new Set(["variant", "warranty", "compatibility", "cellType", "type"]);
+
   for (const raw of attributeList) {
     const attrs = asAttributes(raw);
     for (const [key, value] of Object.entries(attrs)) {
+      if (IGNORED_KEYS.has(key)) continue;
+
       if (typeof value === "number" && Number.isFinite(value)) {
         const list = numericValues.get(key) ?? [];
         list.push(value);
@@ -127,7 +131,7 @@ export function inferAttributeFilters(
 
   for (const [key, set] of stringValues) {
     const unique = [...set].sort((a, b) => a.localeCompare(b));
-    if (unique.length < 2) continue;
+    if (unique.length < 1) continue;
     groups.push({
       key,
       label: attributeLabel(key),
@@ -259,6 +263,8 @@ function variantMatchesFilters(
 
 export type FilterableVariant = {
   price: number;
+  /** Original (pre-discount) price for strikethrough display. */
+  originalPrice?: number;
   attributes: unknown;
 };
 
@@ -331,6 +337,8 @@ export type ListedProduct = {
   name: string;
   slug: string;
   price: number;
+  /** Original (pre-discount) price for strikethrough display. */
+  originalPrice?: number;
   keySpec: string | null;
   /** Optional badge label shown on cards, e.g. "Featured" or "Sale" */
   badge?: string;
@@ -361,6 +369,7 @@ export function filterAndSortProducts(
       name: product.name,
       slug: product.slug,
       price: cheapest.price,
+      originalPrice: cheapest.originalPrice,
       keySpec: getKeySpec(cheapest.attributes),
       badge: product.badge,
     });

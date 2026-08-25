@@ -2,14 +2,19 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
-// Seed / CLI scripts prefer the direct (non-pooled) Neon URL.
 const connectionString =
   process.env.DIRECT_URL ?? process.env.DATABASE_URL!;
 
-const adapter = new PrismaPg({
-  connectionString,
-});
+const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
+
+type Attrs = Record<string, string | number | boolean>;
+
+/** Merge optional originalPrice into attributes JSON */
+function attrs(base: Attrs, originalPrice?: number): Attrs {
+  if (originalPrice != null) return { ...base, originalPrice };
+  return base;
+}
 
 async function main() {
   // Clear existing catalog data (order matters for FKs)
@@ -20,443 +25,128 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
 
-  const batteries = await prisma.category.create({
-    data: {
-      name: "Batteries",
-      slug: "batteries",
-    },
-  });
+  // -- Categories --
+  const catLithium = await prisma.category.create({ data: { name: "Lithium Batteries", slug: "lithium-batteries" } });
+  const catInverter = await prisma.category.create({ data: { name: "Hybrid Inverters", slug: "hybrid-inverters" } });
+  const catSolar = await prisma.category.create({ data: { name: "Solar Panels", slug: "solar-panels" } });
+  const catEasyBike = await prisma.category.create({ data: { name: "EasyBike Batteries", slug: "easybike-batteries" } });
+  const catRech = await prisma.category.create({ data: { name: "Rechargeable Batteries", slug: "rechargeable-batteries" } });
+  const catUPS = await prisma.category.create({ data: { name: "UPS Batteries", slug: "ups-batteries" } });
+  const catMoto = await prisma.category.create({ data: { name: "Motorcycle Batteries", slug: "motorcycle-batteries" } });
+  const catAcc = await prisma.category.create({ data: { name: "Accessories & Parts", slug: "accessories" } });
 
-  const panels = await prisma.category.create({
-    data: {
-      name: "Solar Panels",
-      slug: "solar-panels",
-    },
-  });
-
-  const motorcycles = await prisma.category.create({
-    data: {
-      name: "Electric Motorcycles",
-      slug: "electric-motorcycles",
-    },
-  });
-
-  const accessories = await prisma.category.create({
-    data: {
-      name: "Accessories",
-      slug: "accessories",
-    },
-  });
-
-  const inverters = await prisma.category.create({
-    data: {
-      name: "Inverters",
-      slug: "inverters",
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "Akij 48V Lithium Solar Storage Pack",
-      slug: "akij-48v-lithium-solar-storage",
-      description:
-        "High-cycle LiFePO₄ pack for home solar storage and IPS backup. Deep discharge safe with built-in BMS.",
-      categoryId: batteries.id,
-      variants: {
-        create: [
-          {
-            sku: "BAT-48V-100AH",
-            price: 85000,
-            stock: 12,
-            attributes: {
-              capacityAh: 100,
-              voltage: 48,
-              chemistry: "LiFePO4",
-              cycleLife: 4000,
-            },
-          },
-          {
-            sku: "BAT-48V-200AH",
-            price: 155000,
-            stock: 6,
-            attributes: {
-              capacityAh: 200,
-              voltage: 48,
-              chemistry: "LiFePO4",
-              cycleLife: 4000,
-            },
-          },
-        ],
-      },
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "Akij 60V E-Rickshaw Battery Pack",
-      slug: "akij-60v-e-rickshaw-battery",
-      description:
-        "Rugged lithium pack sized for Bangladesh e-rickshaw duty cycles — longer range, lighter than lead-acid.",
-      categoryId: batteries.id,
-      variants: {
-        create: [
-          {
-            sku: "BAT-60V-30AH",
-            price: 42000,
-            stock: 20,
-            attributes: {
-              capacityAh: 30,
-              voltage: 60,
-              rangeKm: 70,
-              chemistry: "LiFePO4",
-            },
-          },
-          {
-            sku: "BAT-60V-45AH",
-            price: 58000,
-            stock: 10,
-            attributes: {
-              capacityAh: 45,
-              voltage: 60,
-              rangeKm: 100,
-              chemistry: "LiFePO4",
-            },
-          },
-        ],
-      },
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "Akij 12V Tubular Lead Acid Battery",
-      slug: "akij-12v-tubular-lead-acid",
-      description:
-        "Reliable deep cycle tubular lead acid battery. Ideal for home IPS and solar applications.",
-      categoryId: batteries.id,
-      variants: {
-        create: [
-          {
-            sku: "BAT-LA-12V-150AH",
-            price: 18000,
-            stock: 30,
-            attributes: {
-              capacityAh: 150,
-              voltage: 12,
-              chemistry: "Lead-Acid",
-              type: "Tubular",
-            },
-          },
-          {
-            sku: "BAT-LA-12V-200AH",
-            price: 24000,
-            stock: 25,
-            attributes: {
-              capacityAh: 200,
-              voltage: 12,
-              chemistry: "Lead-Acid",
-              type: "Tubular",
-            },
-          },
-        ],
-      },
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "Mono PERC Solar Panel",
-      slug: "mono-perc-solar-panel",
-      description:
-        "High-efficiency monocrystalline panel for rooftop and commercial arrays. Strong low-light performance.",
-      categoryId: panels.id,
-      variants: {
-        create: [
-          {
-            sku: "PNL-MONO-450W",
-            price: 12500,
-            stock: 40,
-            attributes: {
-              wattage: 450,
-              cellType: "mono-perc",
-              efficiency: 21.2,
-            },
-          },
-          {
-            sku: "PNL-MONO-550W",
-            price: 14800,
-            stock: 28,
-            attributes: {
-              wattage: 550,
-              cellType: "mono-perc",
-              efficiency: 21.8,
-            },
-          },
-        ],
-      },
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "Polycrystalline Solar Panel",
-      slug: "poly-solar-panel",
-      description:
-        "Value-oriented polycrystalline modules for budget residential installs and rural electrification projects.",
-      categoryId: panels.id,
-      variants: {
-        create: [
-          {
-            sku: "PNL-POLY-330W",
-            price: 8900,
-            stock: 50,
-            attributes: {
-              wattage: 330,
-              cellType: "poly",
-              efficiency: 17.5,
-            },
-          },
-          {
-            sku: "PNL-POLY-400W",
-            price: 10500,
-            stock: 35,
-            attributes: {
-              wattage: 400,
-              cellType: "poly",
-              efficiency: 18.1,
-            },
-          },
-        ],
-      },
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "Urban Commuter E-Scooter",
-      slug: "urban-commuter-e-scooter",
-      description:
-        "Lightweight electric scooter built for city commutes — swappable battery, low running cost per km.",
-      categoryId: motorcycles.id,
-      variants: {
-        create: [
-          {
-            sku: "EMC-URBAN-60KM",
-            price: 145000,
-            stock: 8,
-            attributes: {
-              rangeKm: 60,
-              motorPowerW: 1200,
-              topSpeedKmph: 45,
-            },
-          },
-          {
-            sku: "EMC-URBAN-80KM",
-            price: 168000,
-            stock: 5,
-            attributes: {
-              rangeKm: 80,
-              motorPowerW: 1500,
-              topSpeedKmph: 50,
-            },
-          },
-        ],
-      },
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "Long-Range Electric Motorcycle",
-      slug: "long-range-electric-motorcycle",
-      description:
-        "Highway-capable electric motorcycle with the longest range in the lineup — built for delivery riders and daily long commutes.",
-      categoryId: motorcycles.id,
-      variants: {
-        create: [
-          {
-            sku: "EMC-LR-120KM",
-            price: 285000,
-            stock: 4,
-            attributes: {
-              rangeKm: 120,
-              motorPowerW: 3000,
-              topSpeedKmph: 75,
-            },
-          },
-          {
-            sku: "EMC-LR-150KM",
-            price: 320000,
-            stock: 3,
-            attributes: {
-              rangeKm: 150,
-              motorPowerW: 3500,
-              topSpeedKmph: 80,
-            },
-          },
-        ],
-      },
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "MPPT Solar Charge Controller",
-      slug: "mppt-solar-charge-controller",
-      description:
-        "High-efficiency MPPT controller for solar arrays — protects batteries from overcharge and optimizes panel output.",
-      categoryId: accessories.id,
-      variants: {
-        create: [
-          {
-            sku: "ACC-MPPT-40A",
-            price: 6500,
-            stock: 30,
-            attributes: {
-              ratedCurrentA: 40,
-              voltage: 12,
-            },
-          },
-          {
-            sku: "ACC-MPPT-60A",
-            price: 8900,
-            stock: 22,
-            attributes: {
-              ratedCurrentA: 60,
-              voltage: 24,
-            },
-          },
-        ],
-      },
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "Pure Sine Wave Inverter",
-      slug: "pure-sine-wave-inverter",
-      description:
-        "Clean, stable power for sensitive electronics — pairs with any lithium storage pack in the lineup.",
-      categoryId: inverters.id,
-      variants: {
-        create: [
-          {
-            sku: "ACC-INV-1000W",
-            price: 9800,
-            stock: 18,
-            attributes: {
-              wattage: 1000,
-              voltage: 12,
-            },
-          },
-          {
-            sku: "ACC-INV-2000W",
-            price: 16500,
-            stock: 12,
-            attributes: {
-              wattage: 2000,
-              voltage: 24,
-            },
-          },
-        ],
-      },
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "5kW On-Grid Solar Inverter",
-      slug: "5kw-on-grid-solar-inverter",
-      description:
-        "High-efficiency grid-tied inverter for maximizing ROI on residential solar arrays.",
-      categoryId: inverters.id,
-      variants: {
-        create: [
-          {
-            sku: "INV-ON-5KW",
-            price: 55000,
-            stock: 15,
-            attributes: { wattage: 5000, type: "on-grid", efficiency: 98.2 },
-          },
-        ],
-      },
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "8kW Hybrid Solar Inverter",
-      slug: "8kw-hybrid-solar-inverter",
-      description:
-        "Intelligent energy management for solar, battery, and grid power. Ensures uninterrupted power supply.",
-      categoryId: inverters.id,
-      variants: {
-        create: [
-          {
-            sku: "INV-HYB-8KW",
-            price: 95000,
-            stock: 8,
-            attributes: { wattage: 8000, type: "hybrid", efficiency: 97.6 },
-          },
-        ],
-      },
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "1kW Microinverter",
-      slug: "1kw-microinverter",
-      description:
-        "Panel-level optimization to minimize shading losses and improve system reliability.",
-      categoryId: inverters.id,
-      variants: {
-        create: [
-          {
-            sku: "INV-MIC-1KW",
-            price: 22000,
-            stock: 45,
-            attributes: { wattage: 1000, type: "microinverter", efficiency: 96.5 },
-          },
-        ],
-      },
-    },
-  });
-
-  await prisma.product.create({
-    data: {
-      name: "3kW Off-Grid Inverter",
-      slug: "3kw-off-grid-inverter",
-      description:
-        "Robust off-grid solution for remote installations or complete energy independence.",
-      categoryId: inverters.id,
-      variants: {
-        create: [
-          {
-            sku: "INV-OFF-3KW",
-            price: 42000,
-            stock: 12,
-            attributes: { wattage: 3000, type: "off-grid", efficiency: 93.0 },
-          },
-        ],
-      },
-    },
-  });
-
-  const counts = {
-    categories: await prisma.category.count(),
-    products: await prisma.product.count(),
-    variants: await prisma.productVariant.count(),
+  // -- LITHIUM BATTERIES --
+  type LithiumProduct = {
+    slug: string;
+    name: string;
+    desc: string;
+    variants: {
+      sku: string;
+      price: number;
+      originalPrice?: number;
+      stock: number;
+      baseAttrs: Attrs;
+    }[];
   };
+  const lithiumProducts: LithiumProduct[] = [
+    { slug:"bat-12v-7ah-lifepo4", name:"DJDC 12V 7AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 7AH. Voltage: 12V. Warranty: 5 Years & Recycle.", variants:[{ sku:"BAT-12V-7AH", price:3000, stock:20, baseAttrs:{ voltage:12, capacityAh:7, chemistry:"LiFePO4", warranty:"5 Years & Recycle", brand:"djdc" } }] },
+    { slug:"bat-12v-50ah-lifepo4", name:"DJDC 12V 50AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 50AH. Voltage: 12V. Warranty: 5 Years & Recycle.", variants:[{ sku:"BAT-12V-50AH", price:17500, originalPrice:21500, stock:15, baseAttrs:{ voltage:12, capacityAh:50, chemistry:"LiFePO4", brand:"djdc" } }] },
+    { slug:"bat-12v-100ah-wj-lifepo4", name:"DJDC 12V 100AH WJ IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 100AH. Voltage: 12V.", variants:[{ sku:"BAT-12V-100AH-WJ", price:20800, stock:10, baseAttrs:{ voltage:12, capacityAh:100, chemistry:"LiFePO4", variant:"WJ", brand:"djdc" } }] },
+    { slug:"bat-12v-100ah-lifepo4", name:"DJDC 12V 100AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 100AH. Voltage: 12V.", variants:[{ sku:"BAT-12V-100AH", price:28000, originalPrice:32000, stock:12, baseAttrs:{ voltage:12, capacityAh:100, chemistry:"LiFePO4", brand:"djdc" } }] },
+    { slug:"bat-12v-150ah-lifepo4", name:"DJDC 12V 150AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 150AH. Voltage: 12V.", variants:[{ sku:"BAT-12V-150AH", price:39500, originalPrice:45000, stock:8, baseAttrs:{ voltage:12, capacityAh:150, chemistry:"LiFePO4", brand:"djdc" } }] },
+    { slug:"bat-12v-200ah-wj-lifepo4", name:"DJDC 12V 200AH WJ IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 200AH. Voltage: 12V.", variants:[{ sku:"BAT-12V-200AH-WJ", price:33800, stock:8, baseAttrs:{ voltage:12, capacityAh:200, chemistry:"LiFePO4", variant:"WJ", brand:"djdc" } }] },
+    { slug:"bat-12v-200ah-lifepo4", name:"DJDC 12V 200AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 200AH. Voltage: 12V.", variants:[{ sku:"BAT-12V-200AH", price:54000, originalPrice:60000, stock:6, baseAttrs:{ voltage:12, capacityAh:200, chemistry:"LiFePO4", brand:"djdc" } }] },
+    { slug:"bat-24v-100ah-lifepo4", name:"DJDC 24V 100AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 100AH. Voltage: 24V.", variants:[{ sku:"BAT-24V-100AH", price:52000, stock:8, baseAttrs:{ voltage:24, capacityAh:100, chemistry:"LiFePO4", brand:"djdc" } }] },
+    { slug:"bat-24v-200ah-lifepo4", name:"DJDC 24V 200AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 200AH. Voltage: 24V.", variants:[{ sku:"BAT-24V-200AH", price:110000, originalPrice:115000, stock:5, baseAttrs:{ voltage:24, capacityAh:200, chemistry:"LiFePO4", brand:"djdc" } }] },
+    { slug:"bat-wm-24v-100ah", name:"DJDC Wall-Mounted 24V 100AH LiFePO4 Battery", desc:"Wall-mounted LiFePO4 lithium battery. Capacity: 100AH. Voltage: 24V.", variants:[{ sku:"BAT-WM-24V-100AH", price:70000, stock:6, baseAttrs:{ voltage:24, capacityAh:100, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
+    { slug:"bat-wm-48v-100ah", name:"DJDC Wall-Mounted 48V/51V 100AH LiFePO4 Battery", desc:"Wall-mounted LiFePO4 lithium battery. Capacity: 100AH. Voltage: 48V/51V.", variants:[{ sku:"BAT-WM-48V-100AH", price:130000, originalPrice:140000, stock:5, baseAttrs:{ capacityAh:100, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
+    { slug:"bat-wm-48v-150ah", name:"DJDC Wall-Mounted 51V 150AH PLUS LiFePO4 Battery", desc:"Wall-mounted LiFePO4 PLUS lithium battery. Capacity: 150AH. Voltage: 51V.", variants:[{ sku:"BAT-WM-51V-150AH", price:130000, originalPrice:135000, stock:5, baseAttrs:{ voltage:51, capacityAh:150, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
+    { slug:"bat-wm-48v-200ah", name:"DJDC Wall-Mounted 48V 200AH LiFePO4 Battery", desc:"Wall-mounted LiFePO4 lithium battery. Capacity: 200AH. Voltage: 48V.", variants:[{ sku:"BAT-WM-48V-200AH", price:185000, stock:4, baseAttrs:{ voltage:48, capacityAh:200, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
+    { slug:"bat-wm-48v-330ah", name:"DJDC Wall-Mounted 48V/51V 330AH LiFePO4 Battery", desc:"Premium wall-mounted LiFePO4 lithium battery. Capacity: 330AH. Voltage: 48V/51V. Warranty: 5 Years & Recycle.", variants:[{ sku:"BAT-WM-48V-330AH", price:270000, originalPrice:305000, stock:3, baseAttrs:{ capacityAh:330, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
+    { slug:"bat-akij-48v-90ah", name:"Akij 48V 90AH Lithium Battery", desc:"High-performance 48V 90 Ampere lithium battery from Akij.", variants:[{ sku:"BAT-AKIJ-48V-90AH", price:120000, stock:10, baseAttrs:{ voltage:48, capacityAh:90, chemistry:"Lithium", brand:"akij" } }] },
+    { slug:"bat-akij-48v-120ah", name:"Akij 48V 120AH Lithium Battery", desc:"High-performance 48V 120 Ampere lithium battery from Akij.", variants:[{ sku:"BAT-AKIJ-48V-120AH", price:145000, stock:10, baseAttrs:{ voltage:48, capacityAh:120, chemistry:"Lithium", brand:"akij" } }] },
+  ];
+  for (const p of lithiumProducts) {
+    await prisma.product.create({
+      data: {
+        name: p.name, slug: p.slug, description: p.desc, categoryId: catLithium.id,
+        variants: { create: p.variants.map(v => ({ sku: v.sku, price: v.price, stock: v.stock, attributes: attrs(v.baseAttrs, v.originalPrice) })) },
+      },
+    });
+  }
 
-  console.log("Seed complete:", counts);
+  // -- HYBRID INVERTERS --
+  type InverterProduct = {
+    slug: string;
+    name: string;
+    desc: string;
+    variants: { sku: string; price: number; originalPrice?: number; stock: number; baseAttrs: Attrs }[];
+  };
+  const inverterProducts: InverterProduct[] = [
+    { slug:"inv-pv2000-12v-1.2kw", name:"DJDC PV 2000 Hybrid Solar Inverter (12V 1.2kW)", desc:"Hybrid solar inverter with MPPT charging. Output power: 1.2kW. Battery voltage: 12V.", variants:[{ sku:"INV-PV2000", price:23000, originalPrice:26000, stock:10, baseAttrs:{ wattage:1200, voltage:12, type:"Hybrid", brand:"djdc" } }] },
+    { slug:"inv-pv2500-12v-1.8kw", name:"DJDC PV 2500 Hybrid Solar Inverter (12V 1.8kW)", desc:"Hybrid solar inverter with MPPT charging. Output power: 1.8kW. Battery voltage: 12V.", variants:[{ sku:"INV-PV2500", price:25000, originalPrice:28000, stock:10, baseAttrs:{ wattage:1800, voltage:12, type:"Hybrid", brand:"djdc" } }] },
+    { slug:"inv-pv3000-24v-2.2kw", name:"DJDC PV 3000 Hybrid Solar Inverter (24V 2.2kW)", desc:"Hybrid solar inverter with MPPT charging. Output power: 2.2kW. Battery voltage: 24V.", variants:[{ sku:"INV-PV3000", price:28000, originalPrice:31000, stock:8, baseAttrs:{ wattage:2200, voltage:24, type:"Hybrid", brand:"djdc" } }] },
+    { slug:"inv-pv5000-24v-4.2kw", name:"DJDC PV 5000 Hybrid Solar Inverter (24V 4.2kW)", desc:"Hybrid solar inverter with MPPT charging. Output power: 4.2kW. Battery voltage: 24V.", variants:[{ sku:"INV-PV5000", price:42000, originalPrice:45000, stock:6, baseAttrs:{ wattage:4200, voltage:24, type:"Hybrid", brand:"djdc" } }] },
+    { slug:"inv-pv7000-48v-6.2kw", name:"DJDC PV 7000 Hybrid Solar Inverter (48V 6.2kW)", desc:"Hybrid solar inverter with MPPT charging. Output power: 6.2kW. Battery voltage: 48V.", variants:[{ sku:"INV-PV7000", price:60000, originalPrice:65000, stock:5, baseAttrs:{ wattage:6200, voltage:48, type:"Hybrid", brand:"djdc" } }] },
+    { slug:"inv-pv9000-48v-8.2kw", name:"DJDC PV 9000 Hybrid Solar Inverter (48V 8.2kW)", desc:"Hybrid solar inverter with MPPT charging. Output power: 8.2kW. Battery voltage: 48V.", variants:[{ sku:"INV-PV9000", price:78000, stock:4, baseAttrs:{ wattage:8200, voltage:48, type:"Hybrid", brand:"djdc" } }] },
+    { slug:"inv-pv12000-48v-11kw", name:"DJDC PV 12000 Hybrid Solar Inverter (48V 11kW - 12.2kW)", desc:"High-power hybrid solar inverter. Output power: 11kW-12.2kW. Battery voltage: 48V.", variants:[{ sku:"INV-PV12000", price:105000, originalPrice:114000, stock:3, baseAttrs:{ wattage:12200, voltage:48, type:"Hybrid", brand:"djdc" } }] },
+  ];
+  for (const p of inverterProducts) {
+    await prisma.product.create({
+      data: {
+        name: p.name, slug: p.slug, description: p.desc, categoryId: catInverter.id,
+        variants: { create: p.variants.map(v => ({ sku: v.sku, price: v.price, stock: v.stock, attributes: attrs(v.baseAttrs, v.originalPrice) })) },
+      },
+    });
+  }
+
+  // -- SOLAR PANELS --
+  await prisma.product.create({ data: { name:"DJDC 590W Mono Solar Panel", slug:"solar-590w-single", description:"High-efficiency monocrystalline solar panel. Power: 590W. Priced at BDT 25 per watt. Estimated panel total: BDT 14,750. Warranty: 20 Years & Recycle.", categoryId: catSolar.id, variants: { create: [{ sku:"SOLAR-590W", price:25, stock:50, attributes:{ wattage:590, cellType:"mono", pricePerWatt:true, warranty:"20 Years & Recycle", brand:"djdc" } }] } } });
+  await prisma.product.create({ data: { name:"DJDC 210W Solar Panel", slug:"solar-210w-single", description:"High-efficiency solar panel. Power: 210W. Priced at BDT 27 per watt. Estimated panel total: BDT 5,670. Warranty: 20 Years & Recycle.", categoryId: catSolar.id, variants: { create: [{ sku:"SOLAR-210W", price:27, stock:40, attributes:{ wattage:210, cellType:"mono", pricePerWatt:true, warranty:"20 Years & Recycle", brand:"djdc" } }] } } });
+  await prisma.product.create({ data: { name:"DJDC 590W Solar Panel (8 pcs Pack)", slug:"solar-590w-8pcs-pack", description:"8-piece pack of DJDC 590W solar panels. Total power: 4720W. Warranty: 20 Years & Recycle.", categoryId: catSolar.id, variants: { create: [{ sku:"SOLAR-590W-8PCS", price:125000, stock:10, attributes:attrs({ wattage:4720, cellType:"mono", packSize:8, warranty:"20 Years & Recycle", brand:"djdc" }, 130000) }] } } });
+
+  // -- EASYBIKE BATTERIES --
+  await prisma.product.create({ data: { name:"DJDC 64V 160AH EasyBike Lithium Battery", slug:"eb-64v-160ah", description:"High-performance lithium battery for EasyBike and electric bikes. Voltage: 64V. Capacity: 160AH.", categoryId: catEasyBike.id, variants: { create: [{ sku:"EB-64V-160AH", price:170000, stock:6, attributes:attrs({ voltage:64, capacityAh:160, chemistry:"Lithium", brand:"djdc" }, 180000) }] } } });
+  await prisma.product.create({ data: { name:"DJDC 64V 200AH EasyBike Lithium Battery", slug:"eb-64v-200ah", description:"High-performance lithium battery for EasyBike and electric bikes. Voltage: 64V. Capacity: 200AH.", categoryId: catEasyBike.id, variants: { create: [{ sku:"EB-64V-200AH", price:190000, stock:5, attributes:attrs({ voltage:64, capacityAh:200, chemistry:"Lithium", brand:"djdc" }, 195000) }] } } });
+
+  // -- RECHARGEABLE BATTERIES --
+  type RechProduct = { slug: string; name: string; price: number; originalPrice?: number; stock: number; baseAttrs: Attrs };
+  const rechProducts: RechProduct[] = [
+    { slug:"rech-12v-40ah", name:"DJDC 12V 40AH Rechargeable Battery", price:8000, originalPrice:8500, stock:25, baseAttrs:{ voltage:12, capacityAh:40, chemistry:"Lead-Acid", brand:"djdc" } },
+    { slug:"rech-12v-70ah", name:"DJDC 12V 70AH Rechargeable Battery", price:16000, originalPrice:17200, stock:20, baseAttrs:{ voltage:12, capacityAh:70, chemistry:"Lead-Acid", brand:"djdc" } },
+    { slug:"rech-12v-80ah", name:"DJDC 12V 80AH Rechargeable Battery", price:17500, originalPrice:18300, stock:18, baseAttrs:{ voltage:12, capacityAh:80, chemistry:"Lead-Acid", brand:"djdc" } },
+    { slug:"rech-12v-100ah", name:"DJDC 12V 100AH Rechargeable Battery", price:19500, originalPrice:21500, stock:15, baseAttrs:{ voltage:12, capacityAh:100, chemistry:"Lead-Acid", brand:"djdc" } },
+    { slug:"rech-12v-120ah", name:"DJDC 12V 120AH Rechargeable Battery", price:22650, originalPrice:23500, stock:12, baseAttrs:{ voltage:12, capacityAh:120, chemistry:"Lead-Acid", brand:"djdc" } },
+    { slug:"rech-12v-150ah", name:"DJDC 12V 150AH Rechargeable Battery", price:28500, originalPrice:30200, stock:10, baseAttrs:{ voltage:12, capacityAh:150, chemistry:"Lead-Acid", brand:"djdc" } },
+    { slug:"rech-12v-200ah", name:"DJDC 12V 200AH Rechargeable Battery", price:32000, originalPrice:33000, stock:8, baseAttrs:{ voltage:12, capacityAh:200, chemistry:"Lead-Acid", brand:"djdc" } },
+    { slug:"acid-12v-200", name:"DJDC 12V 200 Model Acid Battery", price:16000, originalPrice:16500, stock:15, baseAttrs:{ voltage:12, capacityAh:200, chemistry:"Acid", brand:"djdc" } },
+  ];
+  for (const p of rechProducts) {
+    await prisma.product.create({ data: { name:p.name, slug:p.slug, description:`Deep-cycle rechargeable battery. Voltage: ${(p.baseAttrs.voltage as number)}V. Capacity: ${p.baseAttrs.capacityAh}AH.`, categoryId:catRech.id, variants:{ create:[{ sku:p.slug.toUpperCase(), price:p.price, stock:p.stock, attributes:attrs(p.baseAttrs, p.originalPrice) }] } } });
+  }
+
+  // -- UPS BATTERIES --
+  type UPSProduct = { slug: string; name: string; price: number; originalPrice?: number; stock: number; baseAttrs: Attrs };
+  const upsProducts: UPSProduct[] = [
+    { slug:"ups-12v-7ah", name:"DJDC 12V 7AH UPS Battery", price:1450, originalPrice:1550, stock:30, baseAttrs:{ voltage:12, capacityAh:7, chemistry:"Lead-Acid", type:"UPS", brand:"djdc" } },
+    { slug:"ups-12v-9ah", name:"DJDC 12V 9AH Lead-Acid UPS Battery", price:1750, originalPrice:1850, stock:25, baseAttrs:{ voltage:12, capacityAh:9, chemistry:"Lead-Acid", type:"UPS", brand:"djdc" } },
+    { slug:"ups-12v-12ah", name:"DJDC 12V 12AH Rechargeable UPS Battery", price:2500, originalPrice:2800, stock:20, baseAttrs:{ voltage:12, capacityAh:12, chemistry:"Lead-Acid", type:"UPS", brand:"djdc" } },
+    { slug:"ups-12v-26ah", name:"DJDC 12V 26AH Rechargeable UPS Battery", price:5600, originalPrice:6200, stock:15, baseAttrs:{ voltage:12, capacityAh:26, chemistry:"Lead-Acid", type:"UPS", brand:"djdc" } },
+  ];
+  for (const p of upsProducts) {
+    await prisma.product.create({ data: { name:p.name, slug:p.slug, description:`Sealed lead-acid UPS battery. Voltage: ${p.baseAttrs.voltage}V. Capacity: ${p.baseAttrs.capacityAh}AH.`, categoryId:catUPS.id, variants:{ create:[{ sku:p.slug.toUpperCase(), price:p.price, stock:p.stock, attributes:attrs(p.baseAttrs, p.originalPrice) }] } } });
+  }
+
+  // -- MOTORCYCLE BATTERIES (Removed for now) --
+  // const motoProducts: MotoProduct[] = [];
+
+  // -- ACCESSORIES --
+  await prisma.product.create({ data: { name:"Solar Inverter Wi-Fi Monitoring Dongle", slug:"acc-wifi-dongle", description:"Wi-Fi plug dongle for remote solar inverter monitoring. Compatible with major hybrid inverter brands.", categoryId:catAcc.id, variants:{ create:[{ sku:"ACC-WIFI-DONGLE", price:2800, stock:30, attributes:attrs({ type:"Wi-Fi Dongle", compatibility:"Universal" }, 4500) }] } } });
+  await prisma.product.create({ data: { name:"12V 6AH Smart Battery Charger", slug:"acc-12v-6ah-charger", description:"Smart battery charger for 12V batteries up to 6AH. Auto cut-off, multi-stage charging.", categoryId:catAcc.id, variants:{ create:[{ sku:"ACC-12V-6AH-CHG", price:1400, stock:25, attributes:attrs({ voltage:12, capacityAh:6, type:"Smart Charger" }, 1500) }] } } });
+
+  console.log("Seeded 54 products across 8 categories.");
 }
 
 main()
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .catch((e) => { console.error(e); process.exit(1); })
+  .finally(() => prisma.$disconnect());

@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { AttributeFilterGroup } from "@/lib/shop-filters";
 
@@ -20,6 +22,7 @@ export function FilterSidebar({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [isOpen, setIsOpen] = useState(false);
 
   function pushParams(params: URLSearchParams) {
     const qs = params.toString();
@@ -84,42 +87,51 @@ export function FilterSidebar({
   }
 
   return (
-    <aside className="flex flex-col gap-8">
-      <div className="flex items-center justify-between gap-2">
+    <aside className="flex flex-col gap-6 lg:gap-8">
+      <div className="flex items-center justify-between gap-2 lg:mb-0">
         <h2 className="font-display text-base font-medium text-ink">Filters</h2>
-        {hasActive ? (
+        <div className="flex items-center gap-4">
+          {hasActive ? (
+            <button
+              type="button"
+              onClick={clearAll}
+              className="text-sm font-medium text-brand hover:underline"
+            >
+              Clear all
+            </button>
+          ) : null}
           <button
             type="button"
-            onClick={clearAll}
-            className="text-sm font-medium text-brand hover:underline"
+            onClick={() => setIsOpen(!isOpen)}
+            className="text-sm font-medium text-ink underline lg:hidden"
           >
-            Clear all
+            {isOpen ? "Hide" : "Show"}
           </button>
-        ) : null}
+        </div>
       </div>
 
-      {categoryGroup ? (
-        <FilterGroup
-          group={categoryGroup}
-          activeFilters={activeFilters}
-          onToggle={toggle}
-        />
-      ) : null}
+      <div
+        className={`gap-x-4 gap-y-8 ${
+          isOpen ? "grid grid-cols-2 sm:grid-cols-3" : "hidden"
+        } lg:flex lg:flex-col lg:gap-8`}
+      >
+        {categoryGroup ? (
+          <FilterGroup
+            group={categoryGroup}
+            activeFilters={activeFilters}
+            onToggle={toggle}
+          />
+        ) : null}
 
-      {categoryScopedAttributes && !categorySelected ? (
-        <p className="rounded-xl border border-dashed border-border bg-surface/60 px-3 py-3 text-sm text-muted-foreground">
-          Select a category to see matching filters (wattage, capacity, range…).
-        </p>
-      ) : null}
-
-      {attributeGroups.map((group) => (
-        <FilterGroup
-          key={group.key}
-          group={group}
-          activeFilters={activeFilters}
-          onToggle={toggle}
-        />
-      ))}
+        {attributeGroups.map((group) => (
+          <FilterGroup
+            key={group.key}
+            group={group}
+            activeFilters={activeFilters}
+            onToggle={toggle}
+          />
+        ))}
+      </div>
     </aside>
   );
 }

@@ -6,6 +6,8 @@ export type ProductVariantDTO = {
   id: string;
   sku: string;
   price: number;
+  /** Original (pre-discount) price for strikethrough display, if discounted. */
+  originalPrice?: number;
   stock: number;
   attributes: unknown;
 };
@@ -52,13 +54,18 @@ export const getProductBySlug = cache(
       if (product && product.variants.length > 0) {
         return {
           ...product,
-          variants: product.variants.map((variant) => ({
-            id: variant.id,
-            sku: variant.sku,
-            price: Number(variant.price),
-            stock: variant.stock,
-            attributes: variant.attributes,
-          })),
+          variants: product.variants.map((variant) => {
+            const attrs = variant.attributes as Record<string, unknown> | null ?? {};
+            const originalPrice = typeof attrs.originalPrice === 'number' ? attrs.originalPrice : undefined;
+            return {
+              id: variant.id,
+              sku: variant.sku,
+              price: Number(variant.price),
+              originalPrice,
+              stock: variant.stock,
+              attributes: attrs,
+            };
+          }),
         };
       }
     } catch (error) {

@@ -85,6 +85,7 @@ function getMockCategoryListing(
     badge: product.badge,
     variants: product.variants.map((v) => ({
       price: v.price,
+      originalPrice: v.originalPrice,
       attributes: v.attributes,
     })),
   }));
@@ -104,6 +105,7 @@ function getMockFilterableCatalog(): FilterableProduct[] {
     badge: product.badge,
     variants: product.variants.map((v) => ({
       price: v.price,
+      originalPrice: v.originalPrice,
       attributes: v.attributes,
     })),
   }));
@@ -138,15 +140,21 @@ async function fetchFilterableCatalog(): Promise<FilterableProduct[]> {
         description: product.description,
         categorySlug: product.category.slug,
         categoryName: product.category.name,
-        // Assign badge by slug — matches the mock catalog logic
+        // Assign badge by slug — featured for premium wall-mounted batteries
         badge:
-          product.slug === "akij-48v-lithium-solar-storage"
+          product.slug === "bat-wm-48v-330ah" || product.slug === "bat-wm-48v-200ah"
             ? "Featured"
             : undefined,
-        variants: product.variants.map((v) => ({
-          price: Number(v.price),
-          attributes: v.attributes,
-        })),
+        variants: product.variants.map((v) => {
+          const attrs = v.attributes as Record<string, unknown> | null ?? {};
+          // originalPrice is stored in attributes JSON since schema has no dedicated column
+          const originalPrice = typeof attrs.originalPrice === 'number' ? attrs.originalPrice : undefined;
+          return {
+            price: Number(v.price),
+            originalPrice,
+            attributes: attrs,
+          };
+        }),
       }));
 
     if (filterable.length > 0) return filterable;
@@ -176,8 +184,8 @@ export async function getCatalogListing(
   const selectedCategories = parseActiveFilters(searchParams, ["category"]);
   const categorySlugs = selectedCategories.category ?? [];
 
-  // Attribute filters are scoped to the selected category/categories only.
-  // With no category picked, only the Category list is shown.
+  // Attribute filters are scoped to the selected category if one is picked,
+  // otherwise they apply to the entire catalog.
   const scopedProducts =
     categorySlugs.length > 0
       ? all.filter(
@@ -185,14 +193,11 @@ export async function getCatalogListing(
             product.categorySlug != null &&
             categorySlugs.includes(product.categorySlug),
         )
-      : [];
+      : all;
 
-  const attributeGroups =
-    categorySlugs.length > 0
-      ? inferAttributeFilters(
-          scopedProducts.flatMap((p) => p.variants.map((v) => v.attributes)),
-        )
-      : [];
+  const attributeGroups = inferAttributeFilters(
+    scopedProducts.flatMap((p) => p.variants.map((v) => v.attributes)),
+  );
 
   const filterGroups = categoryGroup
     ? [categoryGroup, ...attributeGroups]

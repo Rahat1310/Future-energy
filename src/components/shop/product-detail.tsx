@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -55,6 +55,18 @@ function findMatchingVariant(
   });
 }
 
+/** Returns true when the price is a per-watt unit price (< 100 BDT) */
+function isPricePerWatt(price: number): boolean {
+  return price < 100;
+}
+
+/** Parse watts from a wattage attribute */
+function extractWattsFromAttrs(attributes: unknown): number | null {
+  const attrs = parseAttributes(attributes);
+  if (typeof attrs.wattage === "number") return attrs.wattage;
+  return null;
+}
+
 export function ProductDetail({ product }: { product: ProductDetailDTO }) {
   const axes = useMemo(
     () => getVariantSelectorAxes(product.variants),
@@ -92,6 +104,22 @@ export function ProductDetail({ product }: { product: ProductDetailDTO }) {
 
   const quoteHref = `/quote?product=${encodeURIComponent(product.slug)}&variant=${encodeURIComponent(selected.id)}`;
 
+  // Discount / per-watt pricing
+  const isPerWatt = isPricePerWatt(selected.price);
+  const hasDiscount =
+    selected.originalPrice != null && selected.originalPrice > selected.price;
+
+  const discountPct = hasDiscount
+    ? Math.round(
+        ((selected.originalPrice! - selected.price) / selected.originalPrice!) *
+          100,
+      )
+    : 0;
+
+  // For per-watt panels, derive the estimated panel total
+  const panelWatts = isPerWatt ? extractWattsFromAttrs(selected.attributes) : null;
+  const panelTotal = panelWatts != null ? panelWatts * selected.price : null;
+
   function selectAxisValue(axis: string, valueKey: string) {
     const nextSelection = { ...selection, [axis]: valueKey };
     const match = findMatchingVariant(product.variants, nextSelection, axes);
@@ -99,8 +127,6 @@ export function ProductDetail({ product }: { product: ProductDetailDTO }) {
       setSelectedId(match.id);
       return;
     }
-
-    // Fall back to any variant that has this axis value.
     const fallback = product.variants.find((variant) => {
       const attrs = parseAttributes(variant.attributes);
       return attributeValueKey(attrs[axis]) === valueKey;
@@ -144,9 +170,35 @@ export function ProductDetail({ product }: { product: ProductDetailDTO }) {
 
         <h1 className="mt-2 text-3xl text-ink sm:text-4xl">{product.name}</h1>
 
-        <p className="spec-number mt-4 text-2xl font-semibold text-ink sm:text-3xl">
-          {formatPrice(selected.price)}
-        </p>
+        {/* Price block */}
+        <div className="mt-4 flex flex-wrap items-baseline gap-3">
+          <p className="spec-number text-2xl font-semibold text-ink sm:text-3xl">
+            {isPerWatt
+              ? `${formatPrice(selected.price)} / Watt`
+              : formatPrice(selected.price)}
+          </p>
+          {hasDiscount && !isPerWatt && (
+            <p className="spec-number text-lg text-muted-foreground line-through">
+              {formatPrice(selected.originalPrice!)}
+            </p>
+          )}
+          {hasDiscount && discountPct > 0 && !isPerWatt && (
+            <span className="rounded-full bg-rose-100 px-2.5 py-0.5 text-sm font-semibold text-rose-700 dark:bg-rose-900/30 dark:text-rose-400">
+              Save {discountPct}%
+            </span>
+          )}
+        </div>
+
+        {/* Per-watt: estimated panel total */}
+        {isPerWatt && panelTotal != null && (
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Estimated panel total:{" "}
+            <span className="spec-number font-semibold text-ink">
+              {formatPrice(panelTotal)}
+            </span>{" "}
+            ({panelWatts}W x {formatPrice(selected.price)}/W)
+          </p>
+        )}
 
         <p
           className={cn(
@@ -160,7 +212,7 @@ export function ProductDetail({ product }: { product: ProductDetailDTO }) {
           {stockStatus === "low_stock" ? (
             <span className="spec-number text-muted-foreground">
               {" "}
-              · {selected.stock} left
+              - {selected.stock} left
             </span>
           ) : null}
         </p>
@@ -289,7 +341,7 @@ export function ProductDetail({ product }: { product: ProductDetailDTO }) {
 
         {requiresQuote ? (
           <p className="mt-3 text-sm text-muted-foreground">
-            High-ticket items can be quoted for EMI and bulk pricing — or add to
+            High-ticket items can be quoted for EMI and bulk pricing - or add to
             cart to check out directly.
           </p>
         ) : null}
