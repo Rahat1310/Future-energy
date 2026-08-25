@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { UserButton, useAuth, useUser } from "@clerk/nextjs";
-import { ChevronDown, ChevronRight, Menu, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Menu, Star, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { AccountLinks } from "@/components/marketing/account-links";
 import { CartButton } from "@/components/cart/cart-button";
@@ -95,7 +95,15 @@ function MegaMenu({
                       : "text-muted-foreground hover:bg-muted/60 hover:text-ink"
                 }`}
               >
-                {brand.label}
+                <span className="flex items-center gap-2">
+                  {brand.label}
+                  {brand.badge && (
+                    <span className="inline-flex items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-white shadow-sm">
+                      <Star className="size-2 fill-white" aria-hidden />
+                      {brand.badge}
+                    </span>
+                  )}
+                </span>
                 <ChevronRight
                   className={`size-3.5 transition-opacity ${
                     activeBrand?.label === brand.label ? "opacity-60" : "opacity-20"
@@ -316,7 +324,15 @@ export function SiteHeader() {
                               isTransparent ? "text-white/80" : "text-muted-foreground"
                             }`}
                           >
-                            {brand.label}
+                            <span className="flex items-center gap-2">
+                              {brand.label}
+                              {brand.badge && (
+                                <span className="inline-flex items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-white shadow-sm">
+                                  <Star className="size-2 fill-white" aria-hidden />
+                                  {brand.badge}
+                                </span>
+                              )}
+                            </span>
                           </Link>
                           <button
                             type="button"

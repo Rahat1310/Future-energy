@@ -273,6 +273,8 @@ export type FilterableProduct = {
   categorySlug?: string;
   categoryName?: string;
   description?: string;
+  /** Optional badge label shown on cards, e.g. "Featured" or "Sale" */
+  badge?: string;
 };
 
 export function parseSearchQuery(
@@ -330,6 +332,8 @@ export type ListedProduct = {
   slug: string;
   price: number;
   keySpec: string | null;
+  /** Optional badge label shown on cards, e.g. "Featured" or "Sale" */
+  badge?: string;
 };
 
 /**
@@ -358,6 +362,7 @@ export function filterAndSortProducts(
       slug: product.slug,
       price: cheapest.price,
       keySpec: getKeySpec(cheapest.attributes),
+      badge: product.badge,
     });
   }
 

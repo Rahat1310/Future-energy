@@ -82,6 +82,7 @@ function getMockCategoryListing(
     name: product.name,
     slug: product.slug,
     idSortKey: product.id,
+    badge: product.badge,
     variants: product.variants.map((v) => ({
       price: v.price,
       attributes: v.attributes,
@@ -100,6 +101,7 @@ function getMockFilterableCatalog(): FilterableProduct[] {
     description: product.description,
     categorySlug: product.category.slug,
     categoryName: product.category.name,
+    badge: product.badge,
     variants: product.variants.map((v) => ({
       price: v.price,
       attributes: v.attributes,
@@ -136,6 +138,11 @@ async function fetchFilterableCatalog(): Promise<FilterableProduct[]> {
         description: product.description,
         categorySlug: product.category.slug,
         categoryName: product.category.name,
+        // Assign badge by slug — matches the mock catalog logic
+        badge:
+          product.slug === "akij-48v-lithium-solar-storage"
+            ? "Featured"
+            : undefined,
         variants: product.variants.map((v) => ({
           price: Number(v.price),
           attributes: v.attributes,

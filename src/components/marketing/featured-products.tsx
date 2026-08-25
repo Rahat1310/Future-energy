@@ -4,7 +4,7 @@ import Link from "next/link";
 import { formatPrice } from "@/lib/catalog";
 import type { FeaturedProduct } from "@/lib/homepage-data";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Star, Tag } from "lucide-react";
 
 export function FeaturedProducts({ products }: { products: FeaturedProduct[] }) {
   return (
@@ -45,7 +45,26 @@ export function FeaturedProducts({ products }: { products: FeaturedProduct[] }) 
                   className="group flex flex-col h-full overflow-hidden rounded-3xl border border-border bg-surface transition-all hover:border-brand/30 hover:shadow-2xl hover:shadow-brand/10"
                 >
                   <div className="relative aspect-square w-full overflow-hidden bg-muted/30">
+                    {/* Image placeholder */}
                     <div className="absolute inset-0 bg-muted transition-transform duration-700 group-hover:scale-105" aria-hidden />
+                    {/* Badge overlay */}
+                    {product.badge && (
+                      <div
+                        className={[
+                          "absolute top-3 left-3 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold tracking-wide shadow-lg select-none",
+                          product.badge.toLowerCase() === "sale"
+                            ? "bg-gradient-to-r from-red-500 to-rose-500 text-white"
+                            : "bg-gradient-to-r from-amber-400 to-orange-500 text-white",
+                        ].join(" ")}
+                      >
+                        {product.badge.toLowerCase() === "sale" ? (
+                          <Tag className="size-3" aria-hidden />
+                        ) : (
+                          <Star className="size-3 fill-white" aria-hidden />
+                        )}
+                        {product.badge}
+                      </div>
+                    )}
                     <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full transition-transform duration-300 group-hover:translate-y-0 bg-gradient-to-t from-black/60 to-transparent">
                       <span className="text-sm font-medium text-white flex items-center gap-2">
                         View details <ArrowRight className="size-4" />

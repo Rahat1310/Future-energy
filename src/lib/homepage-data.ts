@@ -19,6 +19,8 @@ export type FeaturedProduct = {
   categorySlug: string;
   price: number;
   keySpec: string | null;
+  /** Optional badge label shown on the card, e.g. "Featured" or "Sale" */
+  badge?: string;
 };
 
 export type HeroContent = {
@@ -84,6 +86,11 @@ async function fetchFeaturedProducts(): Promise<FeaturedProduct[]> {
       .filter((product) => product.variants.length > 0)
       .map((product) => {
         const lowestPriceVariant = product.variants[0];
+        // Assign badge by slug — matches the mock catalog logic
+        const badge =
+          product.slug === "akij-48v-lithium-solar-storage"
+            ? "Featured"
+            : undefined;
         return {
           id: product.id,
           name: product.name,
@@ -91,6 +98,7 @@ async function fetchFeaturedProducts(): Promise<FeaturedProduct[]> {
           categorySlug: product.category.slug,
           price: Number(lowestPriceVariant.price),
           keySpec: getKeySpec(lowestPriceVariant.attributes),
+          badge,
         };
       });
 

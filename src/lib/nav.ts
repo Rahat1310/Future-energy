@@ -8,6 +8,8 @@ export type NavBrand = {
   /** Href for "all products from this brand" page */
   href: string;
   children: NavLink[];
+  /** Optional badge shown in the nav dropdown, e.g. "Featured" or "Sale" */
+  badge?: string;
 };
 
 export type NavItem = {
@@ -67,6 +69,7 @@ export const MAIN_NAV: NavItem[] = [
       {
         label: "Akij",
         href: "/shop/batteries?brand=akij",
+        badge: "Featured",
         children: [
           { label: "All Akij batteries", href: "/shop/batteries?brand=akij" },
           { label: "Lithium Batteries", href: "/shop/batteries?brand=akij&type=lithium" },

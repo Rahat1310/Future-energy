@@ -21,6 +21,8 @@ export type MockProduct = {
   description: string;
   category: MockCategory;
   variants: MockVariant[];
+  /** Optional badge label shown on cards, e.g. "Featured" or "Sale" */
+  badge?: string;
 };
 
 export const MOCK_CATEGORIES: MockCategory[] = [
@@ -46,6 +48,7 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     slug: "akij-48v-lithium-solar-storage",
     description:
       "High-cycle LiFePO₄ pack for home solar storage and IPS backup. Deep discharge safe with built-in BMS.",
+    badge: "Featured",
     category: {
       id: "mock-cat-batteries",
       name: "Batteries",
@@ -456,6 +459,10 @@ export function getMockFeaturedProducts() {
     else if (typeof attrs.ratedCurrentA === "number")
       keySpec = `${attrs.ratedCurrentA}A`;
 
+    // Mark the flagship Akij battery as "Featured"
+    const badge =
+      product.id === "mock-prod-storage" ? "Featured" : undefined;
+
     return {
       id: product.id,
       name: product.name,
@@ -463,6 +470,7 @@ export function getMockFeaturedProducts() {
       categorySlug: product.category.slug,
       price: lowest.price,
       keySpec,
+      badge,
     };
   });
 }
