@@ -62,36 +62,15 @@ export const MAIN_NAV: NavItem[] = [
   },
   {
     label: "Batteries",
-    href: "/shop/lithium-batteries",
+    href: "/shop/batteries",
     brands: [
       {
-        label: "BYD Energy",
-        href: "/shop/lithium-batteries?brand=byd",
+        label: "Akij",
+        href: "/shop/batteries?brand=akij",
         children: [
-          { label: "All BYD batteries", href: "/shop/lithium-batteries?brand=byd" },
-          { label: "Battery-Box Premium HVS", href: "/shop/lithium-batteries?brand=byd&series=hvs" },
-          { label: "Battery-Box Premium HVM", href: "/shop/lithium-batteries?brand=byd&series=hvm" },
-          { label: "LFP 48V series", href: "/shop/lithium-batteries?brand=byd&voltage=48-48" },
-        ],
-      },
-      {
-        label: "Pylontech",
-        href: "/shop/lithium-batteries?brand=pylontech",
-        children: [
-          { label: "All Pylontech", href: "/shop/lithium-batteries?brand=pylontech" },
-          { label: "US2000 series", href: "/shop/lithium-batteries?brand=pylontech&series=us2000" },
-          { label: "US3000 series", href: "/shop/lithium-batteries?brand=pylontech&series=us3000" },
-          { label: "Force H2 series", href: "/shop/lithium-batteries?brand=pylontech&series=force-h2" },
-        ],
-      },
-      {
-        label: "CATL",
-        href: "/shop/lithium-batteries?brand=catl",
-        children: [
-          { label: "All CATL batteries", href: "/shop/lithium-batteries?brand=catl" },
-          { label: "E-rickshaw packs", href: "/products/60v-e-rickshaw-battery" },
-          { label: "Solar storage 48V", href: "/products/48v-lithium-solar-storage" },
-          { label: "60V systems", href: "/shop/lithium-batteries?brand=catl&voltage=60-60" },
+          { label: "All Akij batteries", href: "/shop/batteries?brand=akij" },
+          { label: "Lithium Batteries", href: "/shop/batteries?brand=akij&type=lithium" },
+          { label: "Lead Acid Batteries", href: "/shop/batteries?brand=akij&type=lead-acid" },
         ],
       },
     ],

@@ -27,8 +27,8 @@ export const MOCK_CATEGORIES: MockCategory[] = [
   { id: "mock-cat-panels", name: "Solar Panels", slug: "solar-panels" },
   {
     id: "mock-cat-batteries",
-    name: "Lithium Batteries",
-    slug: "lithium-batteries",
+    name: "Batteries",
+    slug: "batteries",
   },
   {
     id: "mock-cat-ebike",
@@ -42,14 +42,14 @@ export const MOCK_CATEGORIES: MockCategory[] = [
 export const MOCK_PRODUCTS: MockProduct[] = [
   {
     id: "mock-prod-storage",
-    name: "48V Lithium Solar Storage Pack",
-    slug: "48v-lithium-solar-storage",
+    name: "Akij 48V Lithium Solar Storage Pack",
+    slug: "akij-48v-lithium-solar-storage",
     description:
       "High-cycle LiFePO₄ pack for home solar storage and IPS backup. Deep discharge safe with built-in BMS.",
     category: {
       id: "mock-cat-batteries",
-      name: "Lithium Batteries",
-      slug: "lithium-batteries",
+      name: "Batteries",
+      slug: "batteries",
     },
     variants: [
       {
@@ -80,14 +80,14 @@ export const MOCK_PRODUCTS: MockProduct[] = [
   },
   {
     id: "mock-prod-rickshaw",
-    name: "60V E-Rickshaw Battery Pack",
-    slug: "60v-e-rickshaw-battery",
+    name: "Akij 60V E-Rickshaw Battery Pack",
+    slug: "akij-60v-e-rickshaw-battery",
     description:
       "Rugged lithium pack sized for Bangladesh e-rickshaw duty cycles — longer range, lighter than lead-acid.",
     category: {
       id: "mock-cat-batteries",
-      name: "Lithium Batteries",
-      slug: "lithium-batteries",
+      name: "Batteries",
+      slug: "batteries",
     },
     variants: [
       {
@@ -112,6 +112,44 @@ export const MOCK_PRODUCTS: MockProduct[] = [
           voltage: 60,
           rangeKm: 100,
           chemistry: "LiFePO4",
+        },
+      },
+    ],
+  },
+  {
+    id: "mock-prod-lead-acid",
+    name: "Akij 12V Tubular Lead Acid Battery",
+    slug: "akij-12v-tubular-lead-acid",
+    description:
+      "Reliable deep cycle tubular lead acid battery. Ideal for home IPS and solar applications.",
+    category: {
+      id: "mock-cat-batteries",
+      name: "Batteries",
+      slug: "batteries",
+    },
+    variants: [
+      {
+        id: "mock-var-la-150",
+        sku: "BAT-LA-12V-150AH",
+        price: 18000,
+        stock: 30,
+        attributes: {
+          capacityAh: 150,
+          voltage: 12,
+          chemistry: "Lead-Acid",
+          type: "Tubular",
+        },
+      },
+      {
+        id: "mock-var-la-200",
+        sku: "BAT-LA-12V-200AH",
+        price: 24000,
+        stock: 25,
+        attributes: {
+          capacityAh: 200,
+          voltage: 12,
+          chemistry: "Lead-Acid",
+          type: "Tubular",
         },
       },
     ],

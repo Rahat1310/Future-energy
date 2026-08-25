@@ -22,8 +22,8 @@ async function main() {
 
   const batteries = await prisma.category.create({
     data: {
-      name: "Lithium Batteries",
-      slug: "lithium-batteries",
+      name: "Batteries",
+      slug: "batteries",
     },
   });
 
@@ -57,8 +57,8 @@ async function main() {
 
   await prisma.product.create({
     data: {
-      name: "48V Lithium Solar Storage Pack",
-      slug: "48v-lithium-solar-storage",
+      name: "Akij 48V Lithium Solar Storage Pack",
+      slug: "akij-48v-lithium-solar-storage",
       description:
         "High-cycle LiFePO₄ pack for home solar storage and IPS backup. Deep discharge safe with built-in BMS.",
       categoryId: batteries.id,
@@ -93,8 +93,8 @@ async function main() {
 
   await prisma.product.create({
     data: {
-      name: "60V E-Rickshaw Battery Pack",
-      slug: "60v-e-rickshaw-battery",
+      name: "Akij 60V E-Rickshaw Battery Pack",
+      slug: "akij-60v-e-rickshaw-battery",
       description:
         "Rugged lithium pack sized for Bangladesh e-rickshaw duty cycles — longer range, lighter than lead-acid.",
       categoryId: batteries.id,
@@ -120,6 +120,42 @@ async function main() {
               voltage: 60,
               rangeKm: 100,
               chemistry: "LiFePO4",
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: "Akij 12V Tubular Lead Acid Battery",
+      slug: "akij-12v-tubular-lead-acid",
+      description:
+        "Reliable deep cycle tubular lead acid battery. Ideal for home IPS and solar applications.",
+      categoryId: batteries.id,
+      variants: {
+        create: [
+          {
+            sku: "BAT-LA-12V-150AH",
+            price: 18000,
+            stock: 30,
+            attributes: {
+              capacityAh: 150,
+              voltage: 12,
+              chemistry: "Lead-Acid",
+              type: "Tubular",
+            },
+          },
+          {
+            sku: "BAT-LA-12V-200AH",
+            price: 24000,
+            stock: 25,
+            attributes: {
+              capacityAh: 200,
+              voltage: 12,
+              chemistry: "Lead-Acid",
+              type: "Tubular",
             },
           },
         ],
