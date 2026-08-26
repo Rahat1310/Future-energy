@@ -129,6 +129,31 @@ export const updateVariantStockSchema = z.object({
     .max(1_000_000, "Stock value is too large."),
 });
 
+export const createProductSchema = z.object({
+  name: requiredTrimmed(FIELD_LIMITS.name, "Name"),
+  slug: requiredTrimmed(100, "Slug"),
+  description: requiredTrimmed(FIELD_LIMITS.message, "Description"),
+  categoryId: requiredTrimmed(FIELD_LIMITS.id, "Category"),
+  sku: requiredTrimmed(100, "SKU"),
+  price: z
+    .number()
+    .min(0, "Price cannot be negative.")
+    .max(100_000_000, "Price is too large."),
+  stock: z
+    .number()
+    .int("Stock must be a whole number.")
+    .min(0, "Stock cannot be negative.")
+    .max(1_000_000, "Stock value is too large."),
+});
+
+export const updateProductSchema = z.object({
+  productId: requiredTrimmed(FIELD_LIMITS.id, "Product"),
+  name: requiredTrimmed(FIELD_LIMITS.name, "Name"),
+  slug: requiredTrimmed(100, "Slug"),
+  description: requiredTrimmed(FIELD_LIMITS.message, "Description"),
+  categoryId: requiredTrimmed(FIELD_LIMITS.id, "Category"),
+});
+
 export function firstZodError(error: z.ZodError): string {
   return error.issues[0]?.message ?? "Invalid input.";
 }
