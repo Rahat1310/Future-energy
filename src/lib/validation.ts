@@ -134,11 +134,17 @@ export const createProductSchema = z.object({
   slug: requiredTrimmed(100, "Slug"),
   description: requiredTrimmed(FIELD_LIMITS.message, "Description"),
   categoryId: requiredTrimmed(FIELD_LIMITS.id, "Category"),
+  image: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   sku: requiredTrimmed(100, "SKU"),
   price: z
     .number()
     .min(0, "Price cannot be negative.")
     .max(100_000_000, "Price is too large."),
+  originalPrice: z
+    .number()
+    .min(0, "Price cannot be negative.")
+    .max(100_000_000, "Price is too large.")
+    .optional(),
   stock: z
     .number()
     .int("Stock must be a whole number.")
@@ -152,6 +158,23 @@ export const updateProductSchema = z.object({
   slug: requiredTrimmed(100, "Slug"),
   description: requiredTrimmed(FIELD_LIMITS.message, "Description"),
   categoryId: requiredTrimmed(FIELD_LIMITS.id, "Category"),
+  image: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  variantId: requiredTrimmed(FIELD_LIMITS.id, "Variant").optional(),
+  sku: requiredTrimmed(100, "SKU"),
+  price: z
+    .number()
+    .min(0, "Price cannot be negative.")
+    .max(100_000_000, "Price is too large."),
+  originalPrice: z
+    .number()
+    .min(0, "Price cannot be negative.")
+    .max(100_000_000, "Price is too large.")
+    .optional(),
+  stock: z
+    .number()
+    .int("Stock must be a whole number.")
+    .min(0, "Stock cannot be negative.")
+    .max(1_000_000, "Stock value is too large."),
 });
 
 export function firstZodError(error: z.ZodError): string {

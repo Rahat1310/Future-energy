@@ -37,6 +37,7 @@ model Product {
   name        String
   slug        String           @unique
   description String
+  image       String?
   categoryId  String
   category    Category         @relation(fields: [categoryId], references: [id])
   variants    ProductVariant[]

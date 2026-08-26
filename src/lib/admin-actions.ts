@@ -121,8 +121,10 @@ export async function createProduct(data: {
   slug: string;
   description: string;
   categoryId: string;
+  image?: string;
   sku: string;
   price: number;
+  originalPrice?: number;
   stock: number;
 }) {
   const staff = await requireStaffAction();
@@ -146,13 +148,16 @@ export async function createProduct(data: {
       slug: parsed.data.slug,
       description: parsed.data.description,
       categoryId: parsed.data.categoryId,
+      image: parsed.data.image || null,
       variants: {
         create: [
           {
             sku: parsed.data.sku,
             price: parsed.data.price,
             stock: parsed.data.stock,
-            attributes: {},
+            attributes: parsed.data.originalPrice != null
+              ? { originalPrice: parsed.data.originalPrice }
+              : {},
           },
         ],
       },
@@ -172,6 +177,12 @@ export async function updateProduct(data: {
   slug: string;
   description: string;
   categoryId: string;
+  image?: string;
+  variantId?: string;
+  sku: string;
+  price: number;
+  originalPrice?: number;
+  stock: number;
 }) {
   const staff = await requireStaffAction();
   if (!staff.ok) return staff;
@@ -187,18 +198,50 @@ export async function updateProduct(data: {
     return { ok: false as const, error: "Product slug already exists." };
   }
 
-  await db.product.update({
-    where: { id: parsed.data.productId },
-    data: {
-      name: parsed.data.name,
-      slug: parsed.data.slug,
-      description: parsed.data.description,
-      categoryId: parsed.data.categoryId,
-    },
+  if (parsed.data.variantId) {
+    const existingSku = await db.productVariant.findUnique({ where: { sku: parsed.data.sku } });
+    if (existingSku && existingSku.id !== parsed.data.variantId) {
+      return { ok: false as const, error: "SKU already exists on another variant." };
+    }
+  }
+
+  await db.$transaction(async (tx) => {
+    await tx.product.update({
+      where: { id: parsed.data.productId },
+      data: {
+        name: parsed.data.name,
+        slug: parsed.data.slug,
+        description: parsed.data.description,
+        categoryId: parsed.data.categoryId,
+        image: parsed.data.image || null,
+      },
+    });
+
+    if (parsed.data.variantId) {
+      // Preserve existing attributes but update originalPrice
+      const variant = await tx.productVariant.findUnique({ where: { id: parsed.data.variantId } });
+      const attrs = (variant?.attributes as Record<string, unknown>) || {};
+      if (parsed.data.originalPrice != null) {
+        attrs.originalPrice = parsed.data.originalPrice;
+      } else {
+        delete attrs.originalPrice;
+      }
+
+      await tx.productVariant.update({
+        where: { id: parsed.data.variantId },
+        data: {
+          sku: parsed.data.sku,
+          price: parsed.data.price,
+          stock: parsed.data.stock,
+          attributes: attrs as any,
+        },
+      });
+    }
   });
 
   revalidatePath("/admin/products");
   revalidatePath(`/admin/products/${parsed.data.productId}/edit`);
+  revalidatePath("/admin/inventory");
   revalidateTag("products", "max");
   revalidateTag("categories", "max");
   return { ok: true as const };

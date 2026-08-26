@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -155,10 +155,17 @@ export function ProductDetail({ product }: { product: ProductDetailDTO }) {
 
   return (
     <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
-      <div
-        className="aspect-square rounded-2xl border border-border bg-muted"
-        aria-hidden
-      />
+      <div className="aspect-square rounded-2xl border border-border bg-muted overflow-hidden relative">
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div aria-hidden className="absolute inset-0 bg-muted" />
+        )}
+      </div>
 
       <div className="flex flex-col">
         <Link

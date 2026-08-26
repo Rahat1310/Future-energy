@@ -111,7 +111,38 @@ export async function getAdminProductById(id: string) {
       slug: true,
       description: true,
       categoryId: true,
+      image: true,
+      variants: {
+        orderBy: { price: "asc" },
+        take: 1,
+        select: {
+          id: true,
+          sku: true,
+          price: true,
+          stock: true,
+          attributes: true,
+        },
+      },
     },
   });
-  return product;
+
+  if (!product) return null;
+
+  const variant = product.variants[0];
+  const attrs = (variant?.attributes as Record<string, unknown>) || {};
+  const originalPrice = typeof attrs.originalPrice === "number" ? attrs.originalPrice : undefined;
+
+  return {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    description: product.description,
+    categoryId: product.categoryId,
+    image: product.image,
+    variantId: variant?.id,
+    sku: variant?.sku || "",
+    price: variant ? Number(variant.price) : 0,
+    originalPrice,
+    stock: variant?.stock || 0,
+  };
 }

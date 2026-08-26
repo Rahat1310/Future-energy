@@ -17,6 +17,7 @@ export type ProductDetailDTO = {
   name: string;
   slug: string;
   description: string;
+  image?: string | null;
   category: { id: string; name: string; slug: string };
   variants: ProductVariantDTO[];
 };
@@ -35,6 +36,7 @@ export const getProductBySlug = cache(
           name: true,
           slug: true,
           description: true,
+          image: true,
           category: {
             select: { id: true, name: true, slug: true },
           },

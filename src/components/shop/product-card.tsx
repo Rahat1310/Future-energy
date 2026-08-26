@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { Star, Tag } from "lucide-react";
 import { formatPrice } from "@/lib/catalog";
 import type { ListedProduct } from "@/lib/shop-filters";
@@ -39,9 +39,16 @@ export function ProductCard({ product }: { product: ListedProduct }) {
       href={`/products/${product.slug}`}
       className="relative flex flex-col gap-2 rounded-xl border border-border bg-surface p-3 transition-all duration-200 hover:border-brand/40 hover:shadow-sm sm:gap-3 sm:rounded-2xl sm:p-5"
     >
-      <div className="relative aspect-square rounded-lg sm:rounded-xl overflow-hidden">
-        {/* Image placeholder */}
-        <div className="absolute inset-0 bg-muted" aria-hidden />
+      <div className="relative aspect-square rounded-lg sm:rounded-xl overflow-hidden bg-muted">
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-muted" aria-hidden />
+        )}
         {/* Badge overlay */}
         {product.badge && (
           <span

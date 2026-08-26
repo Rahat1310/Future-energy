@@ -120,6 +120,7 @@ async function fetchFilterableCatalog(): Promise<FilterableProduct[]> {
         name: true,
         slug: true,
         description: true,
+        image: true,
         category: { select: { name: true, slug: true } },
         variants: {
           select: {
@@ -138,6 +139,7 @@ async function fetchFilterableCatalog(): Promise<FilterableProduct[]> {
         slug: product.slug,
         idSortKey: product.id,
         description: product.description,
+        image: product.image,
         categorySlug: product.category.slug,
         categoryName: product.category.name,
         // Assign badge by slug — featured for premium wall-mounted batteries

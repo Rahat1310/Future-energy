@@ -279,6 +279,7 @@ export type FilterableProduct = {
   categorySlug?: string;
   categoryName?: string;
   description?: string;
+  image?: string | null;
   /** Optional badge label shown on cards, e.g. "Featured" or "Sale" */
   badge?: string;
 };
@@ -342,6 +343,7 @@ export type ListedProduct = {
   keySpec: string | null;
   /** Optional badge label shown on cards, e.g. "Featured" or "Sale" */
   badge?: string;
+  image?: string | null;
 };
 
 /**
@@ -372,6 +374,7 @@ export function filterAndSortProducts(
       originalPrice: cheapest.originalPrice,
       keySpec: getKeySpec(cheapest.attributes),
       badge: product.badge,
+      image: product.image,
     });
   }
 
