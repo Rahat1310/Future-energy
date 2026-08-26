@@ -36,44 +36,42 @@ async function main() {
   const catMoto = await prisma.category.create({ data: { name: "Motorcycle Batteries", slug: "motorcycle-batteries" } });
   const catAcc = await prisma.category.create({ data: { name: "Accessories & Parts", slug: "accessories" } });
 
-  // -- LITHIUM BATTERIES --
-  type LithiumProduct = {
-    slug: string;
-    name: string;
-    desc: string;
-    variants: {
-      sku: string;
-      price: number;
-      originalPrice?: number;
-      stock: number;
-      baseAttrs: Attrs;
-    }[];
-  };
-  const lithiumProducts: LithiumProduct[] = [
-    { slug:"bat-12v-7ah-lifepo4", name:"DJDC 12V 7AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 7AH. Voltage: 12V. Warranty: 5 Years & Recycle.", variants:[{ sku:"BAT-12V-7AH", price:3000, stock:20, baseAttrs:{ voltage:12, capacityAh:7, chemistry:"LiFePO4", warranty:"5 Years & Recycle", brand:"djdc" } }] },
-    { slug:"bat-12v-50ah-lifepo4", name:"DJDC 12V 50AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 50AH. Voltage: 12V. Warranty: 5 Years & Recycle.", variants:[{ sku:"BAT-12V-50AH", price:17500, originalPrice:21500, stock:15, baseAttrs:{ voltage:12, capacityAh:50, chemistry:"LiFePO4", brand:"djdc" } }] },
-    { slug:"bat-12v-100ah-wj-lifepo4", name:"DJDC 12V 100AH WJ IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 100AH. Voltage: 12V.", variants:[{ sku:"BAT-12V-100AH-WJ", price:20800, stock:10, baseAttrs:{ voltage:12, capacityAh:100, chemistry:"LiFePO4", variant:"WJ", brand:"djdc" } }] },
-    { slug:"bat-12v-100ah-lifepo4", name:"DJDC 12V 100AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 100AH. Voltage: 12V.", variants:[{ sku:"BAT-12V-100AH", price:28000, originalPrice:32000, stock:12, baseAttrs:{ voltage:12, capacityAh:100, chemistry:"LiFePO4", brand:"djdc" } }] },
-    { slug:"bat-12v-150ah-lifepo4", name:"DJDC 12V 150AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 150AH. Voltage: 12V.", variants:[{ sku:"BAT-12V-150AH", price:39500, originalPrice:45000, stock:8, baseAttrs:{ voltage:12, capacityAh:150, chemistry:"LiFePO4", brand:"djdc" } }] },
-    { slug:"bat-12v-200ah-wj-lifepo4", name:"DJDC 12V 200AH WJ IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 200AH. Voltage: 12V.", variants:[{ sku:"BAT-12V-200AH-WJ", price:33800, stock:8, baseAttrs:{ voltage:12, capacityAh:200, chemistry:"LiFePO4", variant:"WJ", brand:"djdc" } }] },
-    { slug:"bat-12v-200ah-lifepo4", name:"DJDC 12V 200AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 200AH. Voltage: 12V.", variants:[{ sku:"BAT-12V-200AH", price:54000, originalPrice:60000, stock:6, baseAttrs:{ voltage:12, capacityAh:200, chemistry:"LiFePO4", brand:"djdc" } }] },
-    { slug:"bat-24v-100ah-lifepo4", name:"DJDC 24V 100AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 100AH. Voltage: 24V.", variants:[{ sku:"BAT-24V-100AH", price:52000, stock:8, baseAttrs:{ voltage:24, capacityAh:100, chemistry:"LiFePO4", brand:"djdc" } }] },
-    { slug:"bat-24v-200ah-lifepo4", name:"DJDC 24V 200AH IPS LiFePO4 Battery", desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 200AH. Voltage: 24V.", variants:[{ sku:"BAT-24V-200AH", price:110000, originalPrice:115000, stock:5, baseAttrs:{ voltage:24, capacityAh:200, chemistry:"LiFePO4", brand:"djdc" } }] },
-    { slug:"bat-wm-24v-100ah", name:"DJDC Wall-Mounted 24V 100AH LiFePO4 Battery", desc:"Wall-mounted LiFePO4 lithium battery. Capacity: 100AH. Voltage: 24V.", variants:[{ sku:"BAT-WM-24V-100AH", price:70000, stock:6, baseAttrs:{ voltage:24, capacityAh:100, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
-    { slug:"bat-wm-48v-100ah", name:"DJDC Wall-Mounted 48V/51V 100AH LiFePO4 Battery", desc:"Wall-mounted LiFePO4 lithium battery. Capacity: 100AH. Voltage: 48V/51V.", variants:[{ sku:"BAT-WM-48V-100AH", price:130000, originalPrice:140000, stock:5, baseAttrs:{ capacityAh:100, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
-    { slug:"bat-wm-48v-150ah", name:"DJDC Wall-Mounted 51V 150AH PLUS LiFePO4 Battery", desc:"Wall-mounted LiFePO4 PLUS lithium battery. Capacity: 150AH. Voltage: 51V.", variants:[{ sku:"BAT-WM-51V-150AH", price:130000, originalPrice:135000, stock:5, baseAttrs:{ voltage:51, capacityAh:150, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
-    { slug:"bat-wm-48v-200ah", name:"DJDC Wall-Mounted 48V 200AH LiFePO4 Battery", desc:"Wall-mounted LiFePO4 lithium battery. Capacity: 200AH. Voltage: 48V.", variants:[{ sku:"BAT-WM-48V-200AH", price:185000, stock:4, baseAttrs:{ voltage:48, capacityAh:200, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
-    { slug:"bat-wm-48v-330ah", name:"DJDC Wall-Mounted 48V/51V 330AH LiFePO4 Battery", desc:"Premium wall-mounted LiFePO4 lithium battery. Capacity: 330AH. Voltage: 48V/51V. Warranty: 5 Years & Recycle.", variants:[{ sku:"BAT-WM-48V-330AH", price:270000, originalPrice:305000, stock:3, baseAttrs:{ capacityAh:330, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
-    { slug:"bat-akij-48v-90ah", name:"Akij 48V 90AH Lithium Battery", desc:"High-performance 48V 90 Ampere lithium battery from Akij.", variants:[{ sku:"BAT-AKIJ-48V-90AH", price:120000, stock:10, baseAttrs:{ voltage:48, capacityAh:90, chemistry:"Lithium", brand:"akij" } }] },
+  // -- IPS BATTERIES (DJDC LiFePO4 for IPS backup) --
+  type BattProduct = { slug: string; name: string; desc: string; variants: { sku: string; price: number; originalPrice?: number; stock: number; baseAttrs: Attrs }[] };
+  const ipsProducts: BattProduct[] = [
+    { slug:"bat-12v-7ah-lifepo4",     name:"DJDC 12V 7AH IPS LiFePO4 Battery",          desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 7AH. Voltage: 12V. Warranty: 5 Years & Recycle.",   variants:[{ sku:"BAT-12V-7AH",      price:3000,   stock:20, baseAttrs:{ voltage:12, capacityAh:7,   chemistry:"LiFePO4", brand:"djdc" } }] },
+    { slug:"bat-12v-50ah-lifepo4",    name:"DJDC 12V 50AH IPS LiFePO4 Battery",         desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 50AH. Voltage: 12V.",                               variants:[{ sku:"BAT-12V-50AH",     price:17500,  originalPrice:21500, stock:15, baseAttrs:{ voltage:12, capacityAh:50,  chemistry:"LiFePO4", brand:"djdc" } }] },
+    { slug:"bat-12v-100ah-wj-lifepo4",name:"DJDC 12V 100AH WJ IPS LiFePO4 Battery",     desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 100AH. Voltage: 12V.",                              variants:[{ sku:"BAT-12V-100AH-WJ", price:20800,  stock:10, baseAttrs:{ voltage:12, capacityAh:100, chemistry:"LiFePO4", variant:"WJ", brand:"djdc" } }] },
+    { slug:"bat-12v-100ah-lifepo4",   name:"DJDC 12V 100AH IPS LiFePO4 Battery",        desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 100AH. Voltage: 12V.",                              variants:[{ sku:"BAT-12V-100AH",    price:28000,  originalPrice:32000, stock:12, baseAttrs:{ voltage:12, capacityAh:100, chemistry:"LiFePO4", brand:"djdc" } }] },
+    { slug:"bat-12v-150ah-lifepo4",   name:"DJDC 12V 150AH IPS LiFePO4 Battery",        desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 150AH. Voltage: 12V.",                              variants:[{ sku:"BAT-12V-150AH",    price:39500,  originalPrice:45000, stock:8,  baseAttrs:{ voltage:12, capacityAh:150, chemistry:"LiFePO4", brand:"djdc" } }] },
+    { slug:"bat-12v-200ah-wj-lifepo4",name:"DJDC 12V 200AH WJ IPS LiFePO4 Battery",     desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 200AH. Voltage: 12V.",                              variants:[{ sku:"BAT-12V-200AH-WJ", price:33800,  stock:8,  baseAttrs:{ voltage:12, capacityAh:200, chemistry:"LiFePO4", variant:"WJ", brand:"djdc" } }] },
+    { slug:"bat-12v-200ah-lifepo4",   name:"DJDC 12V 200AH IPS LiFePO4 Battery",        desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 200AH. Voltage: 12V.",                              variants:[{ sku:"BAT-12V-200AH",    price:54000,  originalPrice:60000, stock:6,  baseAttrs:{ voltage:12, capacityAh:200, chemistry:"LiFePO4", brand:"djdc" } }] },
+    { slug:"bat-24v-100ah-lifepo4",   name:"DJDC 24V 100AH IPS LiFePO4 Battery",        desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 100AH. Voltage: 24V.",                              variants:[{ sku:"BAT-24V-100AH",    price:52000,  stock:8,  baseAttrs:{ voltage:24, capacityAh:100, chemistry:"LiFePO4", brand:"djdc" } }] },
+    { slug:"bat-24v-200ah-lifepo4",   name:"DJDC 24V 200AH IPS LiFePO4 Battery",        desc:"LiFePO4 lithium battery for IPS/solar home backup. Capacity: 200AH. Voltage: 24V.",                              variants:[{ sku:"BAT-24V-200AH",    price:110000, originalPrice:115000, stock:5, baseAttrs:{ voltage:24, capacityAh:200, chemistry:"LiFePO4", brand:"djdc" } }] },
+  ];
+  for (const p of ipsProducts) {
+    await prisma.product.create({ data: { name:p.name, slug:p.slug, description:p.desc, categoryId:catIPS.id, variants:{ create:p.variants.map(v => ({ sku:v.sku, price:v.price, stock:v.stock, attributes:attrs(v.baseAttrs, v.originalPrice) })) } } });
+  }
+
+  // -- MOUNTED LITHIUM BATTERIES (Wall-Mounted LiFePO4) --
+  const mountedProducts: BattProduct[] = [
+    { slug:"bat-wm-24v-100ah",  name:"DJDC Wall-Mounted 24V 100AH LiFePO4 Battery",       desc:"Wall-mounted LiFePO4 lithium battery. Capacity: 100AH. Voltage: 24V.",                                             variants:[{ sku:"BAT-WM-24V-100AH", price:70000,  stock:6, baseAttrs:{ voltage:24, capacityAh:100, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
+    { slug:"bat-wm-48v-100ah",  name:"DJDC Wall-Mounted 48V/51V 100AH LiFePO4 Battery",   desc:"Wall-mounted LiFePO4 lithium battery. Capacity: 100AH. Voltage: 48V/51V.",                                        variants:[{ sku:"BAT-WM-48V-100AH", price:130000, originalPrice:140000, stock:5, baseAttrs:{ capacityAh:100, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
+    { slug:"bat-wm-48v-150ah",  name:"DJDC Wall-Mounted 51V 150AH PLUS LiFePO4 Battery",  desc:"Wall-mounted LiFePO4 PLUS lithium battery. Capacity: 150AH. Voltage: 51V.",                                       variants:[{ sku:"BAT-WM-51V-150AH", price:130000, originalPrice:135000, stock:5, baseAttrs:{ voltage:51, capacityAh:150, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
+    { slug:"bat-wm-48v-200ah",  name:"DJDC Wall-Mounted 48V 200AH LiFePO4 Battery",       desc:"Wall-mounted LiFePO4 lithium battery. Capacity: 200AH. Voltage: 48V.",                                            variants:[{ sku:"BAT-WM-48V-200AH", price:185000, stock:4, baseAttrs:{ voltage:48, capacityAh:200, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
+    { slug:"bat-wm-48v-330ah",  name:"DJDC Wall-Mounted 48V/51V 330AH LiFePO4 Battery",   desc:"Premium wall-mounted LiFePO4 lithium battery. Capacity: 330AH. Voltage: 48V/51V. Warranty: 5 Years & Recycle.", variants:[{ sku:"BAT-WM-48V-330AH", price:270000, originalPrice:305000, stock:3, baseAttrs:{ capacityAh:330, chemistry:"LiFePO4", type:"Wall-Mounted", brand:"djdc" } }] },
+  ];
+  for (const p of mountedProducts) {
+    await prisma.product.create({ data: { name:p.name, slug:p.slug, description:p.desc, categoryId:catMounted.id, variants:{ create:p.variants.map(v => ({ sku:v.sku, price:v.price, stock:v.stock, attributes:attrs(v.baseAttrs, v.originalPrice) })) } } });
+  }
+
+  // -- LITHIUM BATTERIES (Akij brand) --
+  const akijProducts: BattProduct[] = [
+    { slug:"bat-akij-48v-90ah",  name:"Akij 48V 90AH Lithium Battery",  desc:"High-performance 48V 90 Ampere lithium battery from Akij.",  variants:[{ sku:"BAT-AKIJ-48V-90AH",  price:120000, stock:10, baseAttrs:{ voltage:48, capacityAh:90,  chemistry:"Lithium", brand:"akij" } }] },
     { slug:"bat-akij-48v-120ah", name:"Akij 48V 120AH Lithium Battery", desc:"High-performance 48V 120 Ampere lithium battery from Akij.", variants:[{ sku:"BAT-AKIJ-48V-120AH", price:145000, stock:10, baseAttrs:{ voltage:48, capacityAh:120, chemistry:"Lithium", brand:"akij" } }] },
   ];
-  for (const p of lithiumProducts) {
-    await prisma.product.create({
-      data: {
-        name: p.name, slug: p.slug, description: p.desc, categoryId: catLithium.id,
-        variants: { create: p.variants.map(v => ({ sku: v.sku, price: v.price, stock: v.stock, attributes: attrs(v.baseAttrs, v.originalPrice) })) },
-      },
-    });
+  for (const p of akijProducts) {
+    await prisma.product.create({ data: { name:p.name, slug:p.slug, description:p.desc, categoryId:catLithium.id, variants:{ create:p.variants.map(v => ({ sku:v.sku, price:v.price, stock:v.stock, attributes:attrs(v.baseAttrs, v.originalPrice) })) } } });
   }
 
   // -- HYBRID INVERTERS --
