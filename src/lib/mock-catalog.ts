@@ -39,15 +39,12 @@ export type MockProduct = {
 
 // Build categories from the catalog data
 const categoryMap = new Map<string, MockCategory>();
-for (const p of CATALOG_PRODUCTS) {
-  const slug = CATEGORY_SLUG_MAP[p.category];
-  if (!categoryMap.has(slug)) {
-    categoryMap.set(slug, {
-      id: `cat-${slug}`,
-      name: SLUG_TO_CATEGORY_NAME[slug] ?? p.category,
-      slug,
-    });
-  }
+for (const [slug, name] of Object.entries(SLUG_TO_CATEGORY_NAME)) {
+  categoryMap.set(slug, {
+    id: `cat-${slug}`,
+    name,
+    slug,
+  });
 }
 
 export const MOCK_CATEGORIES: MockCategory[] = [...categoryMap.values()];
