@@ -175,6 +175,7 @@ export function getMockFeaturedProducts() {
       price: lowest.price,
       originalPrice: lowest.originalPrice,
       keySpec,
+      image: null,
       badge: product.badge,
     };
   });

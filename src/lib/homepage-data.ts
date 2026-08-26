@@ -19,6 +19,7 @@ export type FeaturedProduct = {
   categorySlug: string;
   price: number;
   keySpec: string | null;
+  image: string | null;
   /** Optional badge label shown on the card, e.g. "Featured" or "Sale" */
   badge?: string;
 };
@@ -73,6 +74,7 @@ async function fetchFeaturedProducts(): Promise<FeaturedProduct[]> {
         id: true,
         name: true,
         slug: true,
+        image: true,
         category: { select: { slug: true } },
         variants: {
           orderBy: { price: "asc" },
@@ -98,6 +100,7 @@ async function fetchFeaturedProducts(): Promise<FeaturedProduct[]> {
           categorySlug: product.category.slug,
           price: Number(lowestPriceVariant.price),
           keySpec: getKeySpec(lowestPriceVariant.attributes),
+          image: product.image ?? null,
           badge,
         };
       });

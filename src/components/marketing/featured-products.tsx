@@ -44,9 +44,17 @@ export function FeaturedProducts({ products }: { products: FeaturedProduct[] }) 
                   href={`/products/${product.slug}`}
                   className="group flex flex-col h-full overflow-hidden rounded-3xl border border-border bg-surface transition-all hover:border-brand/30 hover:shadow-2xl hover:shadow-brand/10"
                 >
-                  <div className="relative aspect-square w-full overflow-hidden bg-muted/30">
-                    {/* Image placeholder */}
-                    <div className="absolute inset-0 bg-muted transition-transform duration-700 group-hover:scale-105" aria-hidden />
+                  <div className="relative aspect-square w-full overflow-hidden bg-white">
+                    {/* Product image */}
+                    {product.image ? (
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="absolute inset-0 h-full w-full object-contain p-3 transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-muted transition-transform duration-700 group-hover:scale-105" aria-hidden />
+                    )}
                     {/* Badge overlay */}
                     {product.badge && (
                       <div
