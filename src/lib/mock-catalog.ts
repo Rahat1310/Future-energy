@@ -79,12 +79,16 @@ function buildDescription(p: Product): string {
     parts.push("High-performance lithium battery for EasyBike & electric bikes.");
     if (p.voltage) parts.push(`Voltage: ${p.voltage}.`);
     if (p.capacity) parts.push(`Capacity: ${p.capacity}.`);
-  } else if (p.category === "Rechargeable Battery") {
-    parts.push("Deep-cycle rechargeable battery for IPS and solar applications.");
+  } else if (p.category === "Lead Acid Battery") {
+    parts.push("Deep-cycle lead acid battery for general use.");
     if (p.voltage) parts.push(`Voltage: ${p.voltage}.`);
     if (p.capacity) parts.push(`Capacity: ${p.capacity}.`);
-  } else if (p.category === "UPS Battery") {
-    parts.push("Sealed lead-acid rechargeable battery for UPS systems.");
+  } else if (p.category === "IPS Battery") {
+    parts.push("High-performance battery designed for IPS backup systems.");
+    if (p.voltage) parts.push(`Voltage: ${p.voltage}.`);
+    if (p.capacity) parts.push(`Capacity: ${p.capacity}.`);
+  } else if (p.category === "Mounted Lithium Battery") {
+    parts.push("Space-saving wall-mounted lithium battery.");
     if (p.voltage) parts.push(`Voltage: ${p.voltage}.`);
     if (p.capacity) parts.push(`Capacity: ${p.capacity}.`);
   } else if (p.category === "Motorcycle Battery") {

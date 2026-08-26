@@ -47,20 +47,21 @@ export const MAIN_NAV: NavItem[] = [
     brands: [
       {
         label: "Akij",
-        href: "/shop?category=lithium-batteries,rechargeable-batteries,ups-batteries,motorcycle-batteries,easybike-batteries&brand=akij",
+        href: "/shop?category=lithium-batteries,motorcycle-batteries,easybike-batteries,lead-acid-batteries&brand=akij",
         badge: "Featured",
         children: [
-          { label: "All Akij batteries", href: "/shop?category=lithium-batteries,rechargeable-batteries,ups-batteries,motorcycle-batteries,easybike-batteries&brand=akij" },
+          { label: "All Akij batteries", href: "/shop?category=lithium-batteries,motorcycle-batteries,easybike-batteries,lead-acid-batteries&brand=akij" },
           { label: "Lithium Batteries", href: "/shop/lithium-batteries?brand=akij" },
-          { label: "Lead Acid Batteries", href: "/shop/rechargeable-batteries?brand=akij" },
+          { label: "Lead Acid Batteries", href: "/shop/lead-acid-batteries?brand=akij" },
         ],
       },
       {
         label: "DJDC",
-        href: "/shop?category=lithium-batteries,rechargeable-batteries,ups-batteries,motorcycle-batteries,easybike-batteries&brand=djdc",
+        href: "/shop?category=lithium-batteries,motorcycle-batteries,easybike-batteries,ips-batteries,mounted-lithium-batteries&brand=djdc",
         children: [
-          { label: "All DJDC batteries", href: "/shop?category=lithium-batteries,rechargeable-batteries,ups-batteries,motorcycle-batteries,easybike-batteries&brand=djdc" },
-          { label: "UPS & Rechargeable", href: "/shop/ups-batteries?brand=djdc" },
+          { label: "All DJDC batteries", href: "/shop?category=lithium-batteries,motorcycle-batteries,easybike-batteries,ips-batteries,mounted-lithium-batteries&brand=djdc" },
+          { label: "IPS", href: "/shop/ips-batteries?brand=djdc" },
+          { label: "Mounted Lithium", href: "/shop/mounted-lithium-batteries?brand=djdc" },
         ],
       },
     ],

@@ -4,9 +4,10 @@ export interface Product {
     | 'Lithium Battery'
     | 'Hybrid Inverter'
     | 'Solar Panel'
-    | 'Rechargeable Battery'
+    | 'Lead Acid Battery'
     | 'EasyBike Lithium Battery'
-    | 'UPS Battery'
+    | 'IPS Battery'
+    | 'Mounted Lithium Battery'
     | 'Motorcycle Battery'
     | 'Accessories & Parts';
   title: string;
@@ -56,21 +57,8 @@ export const products: Product[] = [
   { id:"eb-64v-160ah", category:"EasyBike Lithium Battery", title:"64V 160AH EasyBike Lithium Battery", model:"64V 160AH", voltage:"64V", capacity:"160AH", retailPriceBDT:170000, originalPriceBDT:180000 },
   { id:"eb-64v-200ah", category:"EasyBike Lithium Battery", title:"64V 200AH EasyBike Lithium Battery", model:"64V 200AH", voltage:"64V", capacity:"200AH", retailPriceBDT:190000, originalPriceBDT:195000 },
 
-  // --- RECHARGEABLE BATTERIES ---
-  { id:"rech-12v-40ah", category:"Rechargeable Battery", title:"12V 40AH Rechargeable Battery", model:"12V 40AH", voltage:"12V", capacity:"40AH", retailPriceBDT:8000, originalPriceBDT:8500 },
-  { id:"rech-12v-70ah", category:"Rechargeable Battery", title:"12V 70AH Rechargeable Battery", model:"12V 70AH", voltage:"12V", capacity:"70AH", retailPriceBDT:16000, originalPriceBDT:17200 },
-  { id:"rech-12v-80ah", category:"Rechargeable Battery", title:"12V 80AH Rechargeable Battery", model:"12V 80AH", voltage:"12V", capacity:"80AH", retailPriceBDT:17500, originalPriceBDT:18300 },
-  { id:"rech-12v-100ah", category:"Rechargeable Battery", title:"12V 100AH Rechargeable Battery", model:"12V 100AH", voltage:"12V", capacity:"100AH", retailPriceBDT:19500, originalPriceBDT:21500 },
-  { id:"rech-12v-120ah", category:"Rechargeable Battery", title:"12V 120AH Rechargeable Battery", model:"12V 120AH", voltage:"12V", capacity:"120AH", retailPriceBDT:22650, originalPriceBDT:23500 },
-  { id:"rech-12v-150ah", category:"Rechargeable Battery", title:"12V 150AH Rechargeable Battery", model:"12V 150AH", voltage:"12V", capacity:"150AH", retailPriceBDT:28500, originalPriceBDT:30200 },
-  { id:"rech-12v-200ah", category:"Rechargeable Battery", title:"12V 200AH Rechargeable Battery", model:"12V 200AH", voltage:"12V", capacity:"200AH", retailPriceBDT:32000, originalPriceBDT:33000 },
-  { id:"acid-12v-200", category:"Rechargeable Battery", title:"12V 200 Model Acid Battery", model:"12V 200", voltage:"12V", capacity:"200AH", retailPriceBDT:16000, originalPriceBDT:16500 },
-
-  // --- UPS BATTERIES ---
-  { id:"ups-12v-7ah", category:"UPS Battery", title:"12V 7AH UPS Battery", model:"12V 7AH", voltage:"12V", capacity:"7AH", retailPriceBDT:1450, originalPriceBDT:1550 },
-  { id:"ups-12v-9ah", category:"UPS Battery", title:"12V 9AH Lead-Acid UPS Battery", model:"12V 9AH", voltage:"12V", capacity:"9AH", retailPriceBDT:1750, originalPriceBDT:1850 },
-  { id:"ups-12v-12ah", category:"UPS Battery", title:"12V 12AH Rechargeable UPS Battery", model:"12V 12AH", voltage:"12V", capacity:"12AH", retailPriceBDT:2500, originalPriceBDT:2800 },
-  { id:"ups-12v-26ah", category:"UPS Battery", title:"12V 26AH Rechargeable UPS Battery", model:"12V 26AH", voltage:"12V", capacity:"26AH", retailPriceBDT:5600, originalPriceBDT:6200 },
+  // --- LEAD ACID BATTERIES ---
+  { id:"acid-12v-200", category:"Lead Acid Battery", title:"12V 200 Model Lead Acid Battery", model:"12V 200", voltage:"12V", capacity:"200AH", retailPriceBDT:16000, originalPriceBDT:16500 },
 
   // --- MOTORCYCLE BATTERIES ---
   { id:"moto-12v-2.5l", category:"Motorcycle Battery", title:"12V 2.5L Motorcycle Battery", model:"12V 2.5L", voltage:"12V", retailPriceBDT:900, originalPriceBDT:950 },
@@ -93,8 +81,9 @@ export const CATEGORY_SLUG_MAP: Record<Product['category'], string> = {
   'Hybrid Inverter': 'hybrid-inverters',
   'Solar Panel': 'solar-panels',
   'EasyBike Lithium Battery': 'easybike-batteries',
-  'Rechargeable Battery': 'rechargeable-batteries',
-  'UPS Battery': 'ups-batteries',
+  'Lead Acid Battery': 'lead-acid-batteries',
+  'IPS Battery': 'ips-batteries',
+  'Mounted Lithium Battery': 'mounted-lithium-batteries',
   'Motorcycle Battery': 'motorcycle-batteries',
   'Accessories & Parts': 'accessories',
 };
@@ -104,8 +93,9 @@ export const SLUG_TO_CATEGORY_NAME: Record<string, string> = {
   'hybrid-inverters': 'Hybrid Inverters',
   'solar-panels': 'Solar Panels',
   'easybike-batteries': 'EasyBike Batteries',
-  'rechargeable-batteries': 'Rechargeable Batteries',
-  'ups-batteries': 'UPS Batteries',
+  'lead-acid-batteries': 'Lead Acid Batteries',
+  'ips-batteries': 'IPS Batteries',
+  'mounted-lithium-batteries': 'Mounted Lithium Batteries',
   'motorcycle-batteries': 'Motorcycle Batteries',
   'accessories': 'Accessories & Parts',
 };

@@ -30,8 +30,9 @@ async function main() {
   const catInverter = await prisma.category.create({ data: { name: "Hybrid Inverters", slug: "hybrid-inverters" } });
   const catSolar = await prisma.category.create({ data: { name: "Solar Panels", slug: "solar-panels" } });
   const catEasyBike = await prisma.category.create({ data: { name: "EasyBike Batteries", slug: "easybike-batteries" } });
-  const catRech = await prisma.category.create({ data: { name: "Rechargeable Batteries", slug: "rechargeable-batteries" } });
-  const catUPS = await prisma.category.create({ data: { name: "UPS Batteries", slug: "ups-batteries" } });
+  const catLeadAcid = await prisma.category.create({ data: { name: "Lead Acid Batteries", slug: "lead-acid-batteries" } });
+  const catIPS = await prisma.category.create({ data: { name: "IPS Batteries", slug: "ips-batteries" } });
+  const catMounted = await prisma.category.create({ data: { name: "Mounted Lithium Batteries", slug: "mounted-lithium-batteries" } });
   const catMoto = await prisma.category.create({ data: { name: "Motorcycle Batteries", slug: "motorcycle-batteries" } });
   const catAcc = await prisma.category.create({ data: { name: "Accessories & Parts", slug: "accessories" } });
 
@@ -109,32 +110,13 @@ async function main() {
   await prisma.product.create({ data: { name:"DJDC 64V 160AH EasyBike Lithium Battery", slug:"eb-64v-160ah", description:"High-performance lithium battery for EasyBike and electric bikes. Voltage: 64V. Capacity: 160AH.", categoryId: catEasyBike.id, variants: { create: [{ sku:"EB-64V-160AH", price:170000, stock:6, attributes:attrs({ voltage:64, capacityAh:160, chemistry:"Lithium", brand:"djdc" }, 180000) }] } } });
   await prisma.product.create({ data: { name:"DJDC 64V 200AH EasyBike Lithium Battery", slug:"eb-64v-200ah", description:"High-performance lithium battery for EasyBike and electric bikes. Voltage: 64V. Capacity: 200AH.", categoryId: catEasyBike.id, variants: { create: [{ sku:"EB-64V-200AH", price:190000, stock:5, attributes:attrs({ voltage:64, capacityAh:200, chemistry:"Lithium", brand:"djdc" }, 195000) }] } } });
 
-  // -- RECHARGEABLE BATTERIES --
-  type RechProduct = { slug: string; name: string; price: number; originalPrice?: number; stock: number; baseAttrs: Attrs };
-  const rechProducts: RechProduct[] = [
-    { slug:"rech-12v-40ah", name:"DJDC 12V 40AH Rechargeable Battery", price:8000, originalPrice:8500, stock:25, baseAttrs:{ voltage:12, capacityAh:40, chemistry:"Lead-Acid", brand:"djdc" } },
-    { slug:"rech-12v-70ah", name:"DJDC 12V 70AH Rechargeable Battery", price:16000, originalPrice:17200, stock:20, baseAttrs:{ voltage:12, capacityAh:70, chemistry:"Lead-Acid", brand:"djdc" } },
-    { slug:"rech-12v-80ah", name:"DJDC 12V 80AH Rechargeable Battery", price:17500, originalPrice:18300, stock:18, baseAttrs:{ voltage:12, capacityAh:80, chemistry:"Lead-Acid", brand:"djdc" } },
-    { slug:"rech-12v-100ah", name:"DJDC 12V 100AH Rechargeable Battery", price:19500, originalPrice:21500, stock:15, baseAttrs:{ voltage:12, capacityAh:100, chemistry:"Lead-Acid", brand:"djdc" } },
-    { slug:"rech-12v-120ah", name:"DJDC 12V 120AH Rechargeable Battery", price:22650, originalPrice:23500, stock:12, baseAttrs:{ voltage:12, capacityAh:120, chemistry:"Lead-Acid", brand:"djdc" } },
-    { slug:"rech-12v-150ah", name:"DJDC 12V 150AH Rechargeable Battery", price:28500, originalPrice:30200, stock:10, baseAttrs:{ voltage:12, capacityAh:150, chemistry:"Lead-Acid", brand:"djdc" } },
-    { slug:"rech-12v-200ah", name:"DJDC 12V 200AH Rechargeable Battery", price:32000, originalPrice:33000, stock:8, baseAttrs:{ voltage:12, capacityAh:200, chemistry:"Lead-Acid", brand:"djdc" } },
+  // -- LEAD ACID BATTERIES --
+  type LeadAcidProduct = { slug: string; name: string; price: number; originalPrice?: number; stock: number; baseAttrs: Attrs };
+  const leadAcidProducts: LeadAcidProduct[] = [
     { slug:"acid-12v-200", name:"DJDC 12V 200 Model Acid Battery", price:16000, originalPrice:16500, stock:15, baseAttrs:{ voltage:12, capacityAh:200, chemistry:"Acid", brand:"djdc" } },
   ];
-  for (const p of rechProducts) {
-    await prisma.product.create({ data: { name:p.name, slug:p.slug, description:`Deep-cycle rechargeable battery. Voltage: ${(p.baseAttrs.voltage as number)}V. Capacity: ${p.baseAttrs.capacityAh}AH.`, categoryId:catRech.id, variants:{ create:[{ sku:p.slug.toUpperCase(), price:p.price, stock:p.stock, attributes:attrs(p.baseAttrs, p.originalPrice) }] } } });
-  }
-
-  // -- UPS BATTERIES --
-  type UPSProduct = { slug: string; name: string; price: number; originalPrice?: number; stock: number; baseAttrs: Attrs };
-  const upsProducts: UPSProduct[] = [
-    { slug:"ups-12v-7ah", name:"DJDC 12V 7AH UPS Battery", price:1450, originalPrice:1550, stock:30, baseAttrs:{ voltage:12, capacityAh:7, chemistry:"Lead-Acid", type:"UPS", brand:"djdc" } },
-    { slug:"ups-12v-9ah", name:"DJDC 12V 9AH Lead-Acid UPS Battery", price:1750, originalPrice:1850, stock:25, baseAttrs:{ voltage:12, capacityAh:9, chemistry:"Lead-Acid", type:"UPS", brand:"djdc" } },
-    { slug:"ups-12v-12ah", name:"DJDC 12V 12AH Rechargeable UPS Battery", price:2500, originalPrice:2800, stock:20, baseAttrs:{ voltage:12, capacityAh:12, chemistry:"Lead-Acid", type:"UPS", brand:"djdc" } },
-    { slug:"ups-12v-26ah", name:"DJDC 12V 26AH Rechargeable UPS Battery", price:5600, originalPrice:6200, stock:15, baseAttrs:{ voltage:12, capacityAh:26, chemistry:"Lead-Acid", type:"UPS", brand:"djdc" } },
-  ];
-  for (const p of upsProducts) {
-    await prisma.product.create({ data: { name:p.name, slug:p.slug, description:`Sealed lead-acid UPS battery. Voltage: ${p.baseAttrs.voltage}V. Capacity: ${p.baseAttrs.capacityAh}AH.`, categoryId:catUPS.id, variants:{ create:[{ sku:p.slug.toUpperCase(), price:p.price, stock:p.stock, attributes:attrs(p.baseAttrs, p.originalPrice) }] } } });
+  for (const p of leadAcidProducts) {
+    await prisma.product.create({ data: { name:p.name, slug:p.slug, description:`Deep-cycle lead acid battery. Voltage: ${(p.baseAttrs.voltage as number)}V. Capacity: ${p.baseAttrs.capacityAh}AH.`, categoryId:catLeadAcid.id, variants:{ create:[{ sku:p.slug.toUpperCase(), price:p.price, stock:p.stock, attributes:attrs(p.baseAttrs, p.originalPrice) }] } } });
   }
 
   // -- MOTORCYCLE BATTERIES (Removed for now) --
