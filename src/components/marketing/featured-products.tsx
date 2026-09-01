@@ -1,10 +1,194 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/catalog";
 import type { FeaturedProduct } from "@/lib/homepage-data";
+import { useCart } from "@/components/cart/cart-context";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Tag } from "lucide-react";
+import { ArrowRight, Check, ShoppingCart, Sparkles, Star, Tag, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+function FeaturedProductCard({ product }: { product: FeaturedProduct }) {
+  const { add } = useCart();
+  const [added, setAdded] = useState(false);
+
+  const hasDiscount =
+    product.originalPrice != null && product.originalPrice > product.price;
+
+  const discountPct = hasDiscount
+    ? Math.round(
+        ((product.originalPrice! - product.price) / product.originalPrice!) *
+          100,
+      )
+    : 0;
+
+  const isOutOfStock = product.stock !== undefined && product.stock <= 0;
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const variantId = product.variantId || `var-${product.id}`;
+    const variantSku = product.variantSku || product.id.toUpperCase();
+    const stock = product.stock ?? 10;
+
+    const result = add({
+      productId: product.id,
+      variantId,
+      productSlug: product.slug,
+      productName: product.name,
+      variantSku,
+      keySpec: product.keySpec,
+      price: product.price,
+      stock,
+      quantity: 1,
+      image: product.image,
+    });
+
+    if (result.ok) {
+      setAdded(true);
+      setTimeout(() => setAdded(false), 1600);
+    }
+  };
+
+  return (
+    <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-surface p-3 sm:p-4 transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-xl hover:shadow-brand/5 dark:bg-card dark:border-border/60">
+      {/* Top energy glow line on hover */}
+      <span className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-brand/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+      {/* Main Content */}
+      <div className="flex flex-col gap-3">
+        {/* Product Image Stage */}
+        <Link
+          href={`/products/${product.slug}`}
+          className="relative aspect-square w-full overflow-hidden rounded-xl border border-border/40 bg-gradient-to-b from-neutral-50 via-white to-neutral-100/60 p-2 sm:p-3 dark:from-neutral-900/60 dark:via-neutral-900/40 dark:to-neutral-950/60 flex items-center justify-center"
+        >
+          {product.image ? (
+            <img
+              src={product.image}
+              alt={product.name}
+              className="h-full w-full object-contain p-1.5 transition-transform duration-500 ease-out group-hover:scale-105 drop-shadow-xs"
+            />
+          ) : (
+            <div className="h-full w-full bg-muted/60 rounded-lg flex items-center justify-center" aria-hidden>
+              <Zap className="size-8 text-muted-foreground/30" />
+            </div>
+          )}
+
+          {/* Badges Overlay */}
+          <div className="pointer-events-none absolute inset-x-2 top-2 flex items-start justify-between gap-1.5">
+            <div>
+              {product.badge ? (
+                <span
+                  className={cn(
+                    "flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wide shadow-sm select-none",
+                    product.badge.toLowerCase() === "sale"
+                      ? "bg-gradient-to-r from-red-500 to-rose-500 text-white"
+                      : "bg-gradient-to-r from-emerald-600 to-teal-600 text-white",
+                  )}
+                >
+                  {product.badge.toLowerCase() === "sale" ? (
+                    <Tag className="size-2.5" aria-hidden />
+                  ) : (
+                    <Sparkles className="size-2.5 fill-white" aria-hidden />
+                  )}
+                  {product.badge}
+                </span>
+              ) : !isOutOfStock ? (
+                <span className="flex items-center gap-1 rounded-full bg-surface/90 px-2 py-0.5 text-[10px] font-medium text-emerald-700 shadow-xs backdrop-blur-xs border border-border/60 dark:bg-card/90 dark:text-emerald-400 select-none">
+                  <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  In Stock
+                </span>
+              ) : null}
+            </div>
+
+            {/* Discount % Pill */}
+            {hasDiscount && discountPct > 0 && (
+              <span className="flex items-center gap-0.5 rounded-full bg-rose-600 px-1.5 py-0.5 text-[10px] font-bold text-white shadow-xs select-none">
+                -{discountPct}%
+              </span>
+            )}
+          </div>
+
+          {/* Hover Quick View Overlay */}
+          <div className="absolute inset-x-0 bottom-0 py-1.5 px-2.5 bg-gradient-to-t from-black/50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 flex items-center justify-between text-white text-[11px] font-medium">
+            <span>View Details</span>
+            <ArrowRight className="size-3" />
+          </div>
+        </Link>
+
+        {/* Product Details */}
+        <div className="flex flex-col gap-1.5">
+          {/* Key Spec Chip */}
+          {product.keySpec ? (
+            <div className="flex items-center">
+              <span className="inline-flex items-center gap-1 rounded-md bg-brand/8 px-2 py-0.5 text-[11px] font-mono font-semibold text-brand border border-brand/15">
+                <Zap className="size-2.5 text-brand" />
+                {product.keySpec}
+              </span>
+            </div>
+          ) : null}
+
+          {/* Product Name */}
+          <Link href={`/products/${product.slug}`} className="group/title">
+            <h3 className="line-clamp-2 text-xs font-semibold text-ink sm:text-sm leading-snug transition-colors group-hover/title:text-brand">
+              {product.name}
+            </h3>
+          </Link>
+
+          {/* Price Block */}
+          <div className="flex flex-wrap items-baseline gap-1.5 mt-0.5">
+            <span className="spec-number text-sm font-bold text-ink sm:text-base">
+              {formatPrice(product.price)}
+            </span>
+            {hasDiscount && (
+              <span className="spec-number text-xs text-muted-foreground line-through">
+                {formatPrice(product.originalPrice!)}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Card Action Button */}
+      <div className="mt-3 pt-2 border-t border-border/50">
+        {isOutOfStock ? (
+          <button
+            type="button"
+            disabled
+            className="w-full h-8 sm:h-8.5 rounded-xl text-xs font-medium bg-muted text-muted-foreground cursor-not-allowed select-none"
+          >
+            Out of Stock
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            className={cn(
+              "relative w-full h-8 sm:h-8.5 rounded-xl text-xs sm:text-[13px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs select-none cursor-pointer",
+              added
+                ? "bg-emerald-600 text-white scale-[0.98]"
+                : "bg-brand text-white hover:bg-brand/90 active:scale-[0.98]",
+            )}
+          >
+            {added ? (
+              <>
+                <Check className="size-3.5 stroke-[2.5]" />
+                <span>Added!</span>
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="size-3.5" />
+                <span>Add to Cart</span>
+              </>
+            )}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function FeaturedProducts({ products }: { products: FeaturedProduct[] }) {
   return (
@@ -31,68 +215,16 @@ export function FeaturedProducts({ products }: { products: FeaturedProduct[] }) 
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
             {products.map((product, index) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.5, delay: index * 0.08 }}
               >
-                <Link
-                  href={`/products/${product.slug}`}
-                  className="group flex flex-col h-full overflow-hidden rounded-3xl border border-border bg-surface transition-all hover:border-brand/30 hover:shadow-2xl hover:shadow-brand/10"
-                >
-                  <div className="relative aspect-square w-full overflow-hidden bg-white">
-                    {/* Product image */}
-                    {product.image ? (
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="absolute inset-0 h-full w-full object-contain p-3 transition-transform duration-700 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-muted transition-transform duration-700 group-hover:scale-105" aria-hidden />
-                    )}
-                    {/* Badge overlay */}
-                    {product.badge && (
-                      <div
-                        className={[
-                          "absolute top-3 left-3 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold tracking-wide shadow-lg select-none",
-                          product.badge.toLowerCase() === "sale"
-                            ? "bg-gradient-to-r from-red-500 to-rose-500 text-white"
-                            : "bg-gradient-to-r from-amber-400 to-orange-500 text-white",
-                        ].join(" ")}
-                      >
-                        {product.badge.toLowerCase() === "sale" ? (
-                          <Tag className="size-3" aria-hidden />
-                        ) : (
-                          <Star className="size-3 fill-white" aria-hidden />
-                        )}
-                        {product.badge}
-                      </div>
-                    )}
-                    <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full transition-transform duration-300 group-hover:translate-y-0 bg-gradient-to-t from-black/60 to-transparent">
-                      <span className="text-sm font-medium text-white flex items-center gap-2">
-                        View details <ArrowRight className="size-4" />
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col flex-1 p-5 gap-2">
-                    <h3 className="text-base font-semibold text-ink line-clamp-2">{product.name}</h3>
-                    <div className="mt-auto flex items-end justify-between gap-4 pt-4">
-                      {product.keySpec ? (
-                        <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
-                          {product.keySpec}
-                        </span>
-                      ) : <span />}
-                      <span className="spec-number text-lg font-bold text-brand">
-                        {formatPrice(product.price)}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
+                <FeaturedProductCard product={product} />
               </motion.div>
             ))}
           </div>

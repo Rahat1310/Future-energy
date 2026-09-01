@@ -32,10 +32,11 @@ export async function searchProducts(query: string): Promise<ListedProduct[]> {
           id: true,
           name: true,
           slug: true,
+          image: true,
           variants: {
             orderBy: { price: "asc" },
             take: 1,
-            select: { price: true, attributes: true },
+            select: { id: true, sku: true, stock: true, price: true, attributes: true },
           },
         },
       });
@@ -44,12 +45,19 @@ export async function searchProducts(query: string): Promise<ListedProduct[]> {
         .filter((product) => product.variants.length > 0)
         .map((product) => {
           const cheapest = product.variants[0];
+          const attrs = (cheapest.attributes as Record<string, unknown> | null) ?? {};
+          const originalPrice = typeof attrs.originalPrice === "number" ? attrs.originalPrice : undefined;
           return {
             id: product.id,
             name: product.name,
             slug: product.slug,
+            image: product.image,
             price: Number(cheapest.price),
+            originalPrice,
             keySpec: getKeySpec(cheapest.attributes),
+            variantId: cheapest.id,
+            variantSku: cheapest.sku,
+            stock: cheapest.stock,
           };
         });
     },

@@ -142,6 +142,15 @@ export function SiteFooter() {
                   {SUPPORT_EMAIL}
                 </a>
               </li>
+              <li>
+                <a
+                  href="tel:+8801318323392"
+                  className="inline-flex items-center gap-2 text-white/90 transition-colors hover:text-signal"
+                >
+                  <Phone className="size-4 text-brand" />
+                  +880 1318-323392
+                </a>
+              </li>
               {wa ? (
                 <li>
                   <a

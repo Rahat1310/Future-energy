@@ -166,8 +166,10 @@ export async function createProduct(data: {
 
   revalidatePath("/admin/products");
   revalidatePath("/admin/inventory");
+  revalidatePath("/");
   revalidateTag("products", "max");
   revalidateTag("categories", "max");
+  revalidateTag("homepage", "max");
   return { ok: true as const };
 }
 
@@ -242,8 +244,10 @@ export async function updateProduct(data: {
   revalidatePath("/admin/products");
   revalidatePath(`/admin/products/${parsed.data.productId}/edit`);
   revalidatePath("/admin/inventory");
+  revalidatePath("/");
   revalidateTag("products", "max");
   revalidateTag("categories", "max");
+  revalidateTag("homepage", "max");
   return { ok: true as const };
 }
 

@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { UserButton, useAuth, useUser } from "@clerk/nextjs";
-import { ChevronDown, ChevronRight, Menu, Star, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Menu, Phone, Star, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { AccountLinks } from "@/components/marketing/account-links";
 import { CartButton } from "@/components/cart/cart-button";
@@ -232,6 +232,13 @@ export function SiteHeader() {
           >
             Request a quote
           </Link>
+          <a
+            href="tel:+8801318323392"
+            className={`hidden items-center gap-1.5 text-sm font-medium transition-colors lg:flex ${linkClass}`}
+          >
+            <Phone className="size-3.5" />
+            +880 1318-323392
+          </a>
           <CartButton light={isTransparent} />
           {isSignedIn ? (
             <>

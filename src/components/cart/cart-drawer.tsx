@@ -1,11 +1,36 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Minus, Plus, Trash2, X } from "lucide-react";
+import { Minus, Plus, Trash2, X, Zap } from "lucide-react";
 import { useCart } from "@/components/cart/cart-context";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
+
+function CartItemThumbnail({ image, name }: { image?: string | null; name: string }) {
+  const [hasError, setHasError] = useState(false);
+
+  if (!image || hasError) {
+    return (
+      <div
+        className="size-full rounded-lg bg-muted/60 flex items-center justify-center text-muted-foreground/40"
+        aria-hidden
+      >
+        <Zap className="size-6 text-muted-foreground/40" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={image}
+      alt={name}
+      onError={() => setHasError(true)}
+      className="h-full w-full object-contain"
+    />
+  );
+}
 
 export function CartDrawer() {
   const {
@@ -75,10 +100,13 @@ export function CartDrawer() {
                   key={item.variantId}
                   className="flex gap-3 rounded-2xl border border-border bg-surface p-3"
                 >
-                  <div
-                    className="size-20 shrink-0 rounded-xl bg-muted"
-                    aria-hidden
-                  />
+                  <Link
+                    href={`/products/${item.productSlug}`}
+                    onClick={closeCart}
+                    className="relative size-20 shrink-0 overflow-hidden rounded-xl border border-border/60 bg-gradient-to-b from-neutral-50 via-white to-neutral-100/60 p-1.5 flex items-center justify-center dark:from-neutral-900/60 dark:via-neutral-900/40 dark:to-neutral-950/60 hover:border-brand/40 transition-colors"
+                  >
+                    <CartItemThumbnail image={item.image} name={item.productName} />
+                  </Link>
                   <div className="flex min-w-0 flex-1 flex-col gap-2">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">

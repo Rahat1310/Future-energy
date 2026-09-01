@@ -262,6 +262,9 @@ function variantMatchesFilters(
 }
 
 export type FilterableVariant = {
+  id?: string;
+  sku?: string;
+  stock?: number;
   price: number;
   /** Original (pre-discount) price for strikethrough display. */
   originalPrice?: number;
@@ -344,6 +347,12 @@ export type ListedProduct = {
   /** Optional badge label shown on cards, e.g. "Featured" or "Sale" */
   badge?: string;
   image?: string | null;
+  variantId?: string;
+  variantSku?: string;
+  stock?: number;
+  categorySlug?: string;
+  categoryName?: string;
+  hasMultipleVariants?: boolean;
 };
 
 /**
@@ -375,6 +384,12 @@ export function filterAndSortProducts(
       keySpec: getKeySpec(cheapest.attributes),
       badge: product.badge,
       image: product.image,
+      variantId: cheapest.id,
+      variantSku: cheapest.sku,
+      stock: cheapest.stock,
+      categorySlug: product.categorySlug,
+      categoryName: product.categoryName,
+      hasMultipleVariants: product.variants.length > 1,
     });
   }
 

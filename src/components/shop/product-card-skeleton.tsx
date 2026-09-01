@@ -1,16 +1,22 @@
 export function ProductCardSkeleton() {
   return (
-    <div className="flex animate-pulse flex-col gap-2 rounded-xl border border-border bg-surface p-3 sm:gap-3 sm:rounded-2xl sm:p-5">
-      {/* Image placeholder */}
-      <div className="aspect-square rounded-lg bg-muted sm:rounded-xl" />
-      <div className="flex flex-col gap-1 sm:gap-1.5 mt-1">
-        {/* Title placeholder */}
-        <div className="h-4 w-3/4 rounded-md bg-muted sm:h-5" />
-        <div className="h-4 w-1/2 rounded-md bg-muted sm:h-5" />
-        {/* Spec placeholder */}
-        <div className="mt-1 h-3 w-1/3 rounded-md bg-brand/10 sm:h-4" />
-        {/* Price placeholder */}
-        <div className="mt-1.5 h-5 w-2/5 rounded-md bg-muted sm:h-6" />
+    <div className="flex animate-pulse flex-col justify-between rounded-2xl border border-border/80 bg-surface p-2.5 sm:p-3.5 dark:bg-card dark:border-border/60">
+      <div className="flex flex-col gap-2.5 sm:gap-3">
+        {/* Image placeholder */}
+        <div className="aspect-square w-full rounded-xl bg-muted/70" />
+        <div className="flex flex-col gap-1.5 mt-0.5">
+          {/* Spec placeholder */}
+          <div className="h-4 w-16 rounded-md bg-brand/10" />
+          {/* Title placeholder */}
+          <div className="h-3.5 w-4/5 rounded-md bg-muted/80 sm:h-4" />
+          <div className="h-3.5 w-3/5 rounded-md bg-muted/80 sm:h-4" />
+          {/* Price placeholder */}
+          <div className="mt-1 h-5 w-24 rounded-md bg-muted/90 sm:h-6" />
+        </div>
+      </div>
+      {/* Button placeholder */}
+      <div className="mt-3 pt-2 border-t border-border/50">
+        <div className="h-8 sm:h-8.5 w-full rounded-xl bg-muted/70" />
       </div>
     </div>
   );

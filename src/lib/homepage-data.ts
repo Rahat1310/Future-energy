@@ -18,10 +18,14 @@ export type FeaturedProduct = {
   slug: string;
   categorySlug: string;
   price: number;
+  originalPrice?: number;
   keySpec: string | null;
   image: string | null;
   /** Optional badge label shown on the card, e.g. "Featured" or "Sale" */
   badge?: string;
+  variantId?: string;
+  variantSku?: string;
+  stock?: number;
 };
 
 export type HeroContent = {
@@ -78,8 +82,7 @@ async function fetchFeaturedProducts(): Promise<FeaturedProduct[]> {
         category: { select: { slug: true } },
         variants: {
           orderBy: { price: "asc" },
-          take: 1,
-          select: { price: true, attributes: true },
+          select: { id: true, sku: true, stock: true, price: true, attributes: true },
         },
       },
     });
@@ -87,7 +90,24 @@ async function fetchFeaturedProducts(): Promise<FeaturedProduct[]> {
     const featured = products
       .filter((product) => product.variants.length > 0)
       .map((product) => {
+        // Use the cheapest variant for display price/spec
         const lowestPriceVariant = product.variants[0];
+        const cheapestAttrs = (lowestPriceVariant.attributes as Record<string, unknown> | null) ?? {};
+        const cheapestOriginalPrice = typeof cheapestAttrs.originalPrice === "number" ? cheapestAttrs.originalPrice : undefined;
+
+        // If the cheapest variant has no originalPrice, look for one on any other variant
+        // (originalPrice may have been set on a higher-tier variant in some cases)
+        let originalPrice = cheapestOriginalPrice;
+        if (originalPrice === undefined && product.variants.length > 1) {
+          for (const v of product.variants) {
+            const vAttrs = (v.attributes as Record<string, unknown> | null) ?? {};
+            if (typeof vAttrs.originalPrice === "number") {
+              originalPrice = vAttrs.originalPrice;
+              break;
+            }
+          }
+        }
+
         // Assign badge by slug — matches the mock catalog logic
         const badge =
           product.slug === "akij-48v-lithium-solar-storage"
@@ -99,9 +119,13 @@ async function fetchFeaturedProducts(): Promise<FeaturedProduct[]> {
           slug: product.slug,
           categorySlug: product.category.slug,
           price: Number(lowestPriceVariant.price),
+          originalPrice,
           keySpec: getKeySpec(lowestPriceVariant.attributes),
           image: product.image ?? null,
           badge,
+          variantId: lowestPriceVariant.id,
+          variantSku: lowestPriceVariant.sku,
+          stock: lowestPriceVariant.stock,
         };
       });
 

@@ -22,6 +22,7 @@ export type CartItem = {
   /** Available stock when last added/updated — caps quantity steppers. */
   stock: number;
   quantity: number;
+  image?: string | null;
 };
 
 export type AddToCartInput = Omit<CartItem, "quantity"> & {
@@ -87,6 +88,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 quantity: nextQty,
                 stock: input.stock,
                 price: input.price,
+                image: input.image ?? item.image,
               }
             : item,
         );
@@ -104,6 +106,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           price: input.price,
           stock: input.stock,
           quantity: Math.min(addQty, input.stock),
+          image: input.image,
         },
       ];
     });

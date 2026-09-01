@@ -332,6 +332,7 @@ export function ProductDetail({ product }: { product: ProductDetailDTO }) {
               stock={selected.stock}
               quantity={quantity}
               disabled={outOfStock}
+              image={product.image}
               className="h-12 w-full px-6 text-base sm:w-auto"
             />
             {requiresQuote ? (

@@ -84,6 +84,9 @@ function getMockCategoryListing(
     idSortKey: product.id,
     badge: product.badge,
     variants: product.variants.map((v) => ({
+      id: v.id,
+      sku: v.sku,
+      stock: v.stock,
       price: v.price,
       originalPrice: v.originalPrice,
       attributes: v.attributes,
@@ -104,6 +107,9 @@ function getMockFilterableCatalog(): FilterableProduct[] {
     categoryName: product.category.name,
     badge: product.badge,
     variants: product.variants.map((v) => ({
+      id: v.id,
+      sku: v.sku,
+      stock: v.stock,
       price: v.price,
       originalPrice: v.originalPrice,
       attributes: v.attributes,
@@ -124,6 +130,9 @@ async function fetchFilterableCatalog(): Promise<FilterableProduct[]> {
         category: { select: { name: true, slug: true } },
         variants: {
           select: {
+            id: true,
+            sku: true,
+            stock: true,
             price: true,
             attributes: true,
           },
@@ -152,6 +161,9 @@ async function fetchFilterableCatalog(): Promise<FilterableProduct[]> {
           // originalPrice is stored in attributes JSON since schema has no dedicated column
           const originalPrice = typeof attrs.originalPrice === 'number' ? attrs.originalPrice : undefined;
           return {
+            id: v.id,
+            sku: v.sku,
+            stock: v.stock,
             price: Number(v.price),
             originalPrice,
             attributes: attrs,
