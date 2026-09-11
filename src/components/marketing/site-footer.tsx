@@ -1,7 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, MapPin, MessageCircle, Phone, ShieldCheck } from "lucide-react";
 import { SUPPORT_EMAIL } from "@/lib/constants";
 import { ALL_PRODUCTS_LINK, MAIN_NAV } from "@/lib/nav";
+import { BRANCHES } from "@/lib/branches";
 
 function whatsappHref() {
   const raw = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.trim() ?? "";
@@ -29,10 +31,20 @@ export function SiteFooter() {
       <div className="relative mx-auto max-w-7xl px-4 pt-14 pb-10">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-4">
-            <p className="font-display text-2xl font-semibold tracking-tight">
-              Future Energy <span className="text-signal">BD</span>
-            </p>
-            <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/70">
+            <Link
+              href="/"
+              className="inline-block transition-transform hover:scale-105"
+              aria-label="Future Energy BD"
+            >
+              <Image
+                src="/images/logo-transparent.png"
+                alt="Future Energy BD"
+                width={180}
+                height={90}
+                className="h-16 w-auto object-contain"
+              />
+            </Link>
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
               Lithium batteries, solar panels, and electric rides for Bangladesh
               — built to cut bills and cut carbon.
             </p>
@@ -186,7 +198,35 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">
+        {/* Branches Grid */}
+        <div className="mt-12 border-t border-white/10 pt-8">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-signal">
+            📍 আমাদের শাখাসমূহ :
+          </h3>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {BRANCHES.map((branch) => (
+              <div
+                key={branch.id}
+                className="rounded-xl border border-white/10 bg-white/5 p-4 transition-colors hover:border-brand/50 hover:bg-white/[0.08]"
+              >
+                <p className="font-semibold text-sm text-white">{branch.name}</p>
+                <p className="mt-2 text-xs leading-relaxed text-white/70">
+                  📍 {branch.location}
+                </p>
+                <a
+                  href={`tel:${branch.phoneRaw}`}
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-signal hover:underline"
+                >
+                  <Phone className="size-3" />
+                  {branch.phone}
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">
           <p>© {year} Future Energy BD. All rights reserved.</p>
           <p className="sm:text-right">
             Save money. Save nature. Powered for Bangladesh.

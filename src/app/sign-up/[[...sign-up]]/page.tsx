@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { SignUp } from "@clerk/nextjs";
 import { clerkAppearance } from "@/lib/clerk-appearance";
 
@@ -23,9 +24,17 @@ export default async function SignUpPage({ searchParams }: PageProps) {
       <div className="flex w-full flex-col items-center justify-center px-4 py-16 lg:w-1/2 lg:px-8">
         <Link
           href="/"
-          className="mb-8 font-display text-2xl font-bold tracking-tight text-ink lg:hidden"
+          className="mb-8 inline-block lg:hidden"
+          aria-label="Future Energy BD"
         >
-          Future Energy <span className="text-brand">BD</span>
+          <Image
+            src="/images/logo-transparent.png"
+            alt="Future Energy BD"
+            width={160}
+            height={80}
+            className="h-9 w-auto object-contain"
+            priority
+          />
         </Link>
         <SignUp
           appearance={clerkAppearance}
@@ -43,21 +52,14 @@ export default async function SignUpPage({ searchParams }: PageProps) {
       <div className="hidden w-1/2 items-center justify-center overflow-hidden bg-ink/95 px-10 text-white lg:flex">
         <div className="relative z-10 max-w-md text-center">
           <div className="mb-6 flex justify-center">
-            <div className="flex size-16 items-center justify-center rounded-2xl bg-brand/20 text-brand">
-              <svg
-                className="size-8"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-            </div>
+            <Image
+              src="/images/logo-transparent.png"
+              alt="Future Energy BD"
+              width={180}
+              height={90}
+              className="h-12 w-auto object-contain"
+              priority
+            />
           </div>
           <h2 className="font-display text-3xl font-bold sm:text-4xl">
             Join the green energy revolution.

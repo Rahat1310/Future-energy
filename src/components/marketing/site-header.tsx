@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { UserButton, useAuth, useUser } from "@clerk/nextjs";
 import { ChevronDown, ChevronRight, Menu, Phone, Star, X } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -10,6 +11,7 @@ import { AccountLinks } from "@/components/marketing/account-links";
 import { CartButton } from "@/components/cart/cart-button";
 import { Button } from "@/components/ui/button";
 import { ALL_PRODUCTS_LINK, MAIN_NAV, type NavBrand, type NavItem } from "@/lib/nav";
+import { MarqueeNotice } from "@/components/marketing/marquee-notice";
 
 /** Search is interactive chrome — load after first paint; reserve desktop width to avoid CLS. */
 const SiteSearch = dynamic(
@@ -197,12 +199,21 @@ export function SiteHeader() {
 
   return (
     <header className={headerClass}>
+      <MarqueeNotice />
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
         <Link
           href="/"
-          className={`font-display text-lg font-semibold transition-colors ${logoTextClass}`}
+          className="group inline-flex items-center focus-visible:outline-none"
+          aria-label="Future Energy BD"
         >
-          Future Energy <span className="text-brand">BD</span>
+          <Image
+            src="/images/logo-transparent.png"
+            alt="Future Energy BD"
+            width={160}
+            height={80}
+            priority
+            className="h-8 w-auto object-contain transition-transform group-hover:scale-105 sm:h-9"
+          />
         </Link>
 
         <nav className="hidden items-center gap-7 text-sm font-medium lg:flex">

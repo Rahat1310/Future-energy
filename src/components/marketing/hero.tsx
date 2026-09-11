@@ -56,7 +56,7 @@ export function Hero({ headline, subhead, impact }: HeroProps) {
 
       <div className="pointer-events-none absolute inset-0 z-[1] bg-black/60" />
 
-      <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 py-20 text-center sm:py-28 lg:py-32">
+      <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 pt-28 pb-20 text-center sm:pt-36 sm:pb-28 lg:pt-40 lg:pb-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

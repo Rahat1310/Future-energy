@@ -32,6 +32,15 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Future Energy BD",
   description: "Your trusted green energy e-commerce store in Bangladesh",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/icon.png",
+  },
+  openGraph: {
+    title: "Future Energy BD",
+    description: "Your trusted green energy e-commerce store in Bangladesh",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Future Energy BD" }],
+  },
 };
 
 export default function RootLayout({

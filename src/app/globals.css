@@ -61,6 +61,32 @@
   .bg-glass {
     @apply bg-white/10 backdrop-blur-md border border-white/20 dark:bg-black/20 dark:border-white/10;
   }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  .animate-marquee {
+    display: flex;
+    animation: marquee 35s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-marquee:hover,
+  .group:hover .animate-marquee {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee {
+      animation: none;
+    }
+  }
 }
 
 :root {
