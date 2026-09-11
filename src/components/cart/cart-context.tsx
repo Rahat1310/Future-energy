@@ -9,6 +9,7 @@ import {
   type Context,
   type ReactNode,
 } from "react";
+import { trackPixelEvent } from "@/components/analytics/meta-pixel";
 
 export type CartItem = {
   productId: string;
@@ -112,6 +113,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
 
     setIsOpen(true);
+    trackPixelEvent("AddToCart", {
+      content_name: input.productName,
+      content_ids: [input.variantId || input.productId],
+      content_type: "product",
+      value: input.price * addQty,
+      currency: "BDT",
+    });
     return { ok: true as const };
   }, []);
 

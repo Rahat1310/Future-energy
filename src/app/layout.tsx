@@ -7,6 +7,7 @@ import { DeferredWhatsAppButton } from "@/components/marketing/deferred-whatsapp
 import { Providers } from "@/components/providers";
 import { EnergyBackground } from "@/components/ui/energy-background";
 import { clerkAppearance } from "@/lib/clerk-appearance";
+import { MetaPixel } from "@/components/analytics/meta-pixel";
 import "./globals.css";
 
 const ibmPlexSans = IBM_Plex_Sans({
@@ -62,6 +63,7 @@ export default function RootLayout({
           </Providers>
           <Analytics />
           <SpeedInsights />
+          <MetaPixel />
         </body>
       </html>
     </ClerkProvider>

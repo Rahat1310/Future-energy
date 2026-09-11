@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { HoneypotField } from "@/components/ui/honeypot-field";
 import { createInquiry } from "@/lib/inquiries";
+import { trackPixelEvent } from "@/components/analytics/meta-pixel";
 
 type QuoteTarget = {
   productId: string | null;
@@ -50,6 +51,9 @@ export function QuoteForm({
         return;
       }
 
+      trackPixelEvent("Lead", {
+        content_name: target.productName || "General Quote Request",
+      });
       setSubmitted(true);
     });
   }

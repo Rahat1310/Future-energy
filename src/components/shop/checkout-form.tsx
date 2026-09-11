@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { HoneypotField } from "@/components/ui/honeypot-field";
 import { formatPrice } from "@/lib/catalog";
 import { createOrderFromCart } from "@/lib/orders";
+import { trackPixelEvent } from "@/components/analytics/meta-pixel";
 
 export function CheckoutForm() {
   const router = useRouter();
@@ -26,8 +27,14 @@ export function CheckoutForm() {
   useEffect(() => {
     if (itemCount === 0 && !redirectingTo && !pending) {
       router.replace("/shop");
+    } else if (itemCount > 0) {
+      trackPixelEvent("InitiateCheckout", {
+        value: total,
+        currency: "BDT",
+        num_items: itemCount,
+      });
     }
-  }, [itemCount, router, redirectingTo, pending]);
+  }, [itemCount, router, redirectingTo, pending, total]);
 
   if (redirectingTo) {
     return (
@@ -72,6 +79,12 @@ export function CheckoutForm() {
       }
 
       const paymentPath = `/orders/${result.orderId}/payment`;
+      trackPixelEvent("Purchase", {
+        value: total,
+        currency: "BDT",
+        num_items: items.length,
+        order_id: result.orderId,
+      });
       setRedirectingTo(paymentPath);
       clear();
       router.push(paymentPath);
