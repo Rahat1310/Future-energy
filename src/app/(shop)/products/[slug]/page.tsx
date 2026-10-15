@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/shop/product-detail";
 import { getProductBySlug } from "@/lib/product-data";
+import { socialMetadata } from "@/lib/social-metadata";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -13,10 +14,14 @@ export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) return { title: "Product not found" };
-  return {
+  return socialMetadata({
     title: `${product.name} | Future Energy BD`,
     description: product.description.slice(0, 160),
-  };
+    path: `/products/${encodeURIComponent(product.slug)}`,
+    image: product.image
+      ? { url: product.image, alt: product.name }
+      : undefined,
+  });
 }
 
 export default async function ProductPage({ params }: PageProps) {

@@ -34,3 +34,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Link previews (WhatsApp / Messenger)
+
+Social preview defaults live in `src/lib/social-metadata.ts`. The homepage uses
+`public/og-image.png` (1200 × 630); product links use their catalog photo when
+available, and category links use the branded image. URLs point to
+`https://futureenergybd.com` and are rendered by the Next.js Metadata API.
+
+Deploy these changes to Vercel before testing the public link. Check the
+deployed HTML for `og:title`, `og:description`, `og:url`, and `og:image`, and
+verify the image URL opens without signing in. Use Meta’s Sharing Debugger
+(https://developers.facebook.com/tools/debug/) to inspect or refresh Meta’s
+cached preview, then paste the link into a new WhatsApp or Messenger message.
+Previously sent messages may retain an older preview; the apps control the
+final card layout and caching.

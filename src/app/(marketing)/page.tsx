@@ -9,6 +9,9 @@ import {
   getTopLevelCategories,
 } from "@/lib/homepage-data";
 import { getImpactStats } from "@/lib/impact";
+import { socialMetadata } from "@/lib/social-metadata";
+
+export const metadata = socialMetadata({ path: "/" });
 
 /** ISR: homepage catalog shell — 10 min. Admin stock/price edits also call revalidateTag. */
 export const revalidate = 600;

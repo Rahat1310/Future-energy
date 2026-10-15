@@ -4,6 +4,7 @@ import { FilterSidebar } from "@/components/shop/filter-sidebar";
 import { ProductGrid } from "@/components/shop/product-grid";
 import { SortControl } from "@/components/shop/sort-control";
 import { getCategoryBySlug, getCategoryListing } from "@/lib/shop-data";
+import { socialMetadata } from "@/lib/social-metadata";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -22,10 +23,11 @@ export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);
   if (!category) return { title: "Category not found" };
-  return {
+  return socialMetadata({
     title: `${category.name} | Future Energy BD`,
     description: `Shop ${category.name} — lithium, solar, and electric products for Bangladesh.`,
-  };
+    path: `/shop/${encodeURIComponent(category.slug)}`,
+  });
 }
 
 export default async function CategoryShopPage({

@@ -8,6 +8,7 @@ import { Providers } from "@/components/providers";
 import { EnergyBackground } from "@/components/ui/energy-background";
 import { clerkAppearance } from "@/lib/clerk-appearance";
 import { MetaPixel } from "@/components/analytics/meta-pixel";
+import { SITE_URL, socialMetadata } from "@/lib/social-metadata";
 import "./globals.css";
 
 const ibmPlexSans = IBM_Plex_Sans({
@@ -31,16 +32,11 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Future Energy BD",
-  description: "Your trusted green energy e-commerce store in Bangladesh",
+  metadataBase: new URL(SITE_URL),
+  ...socialMetadata(),
   icons: {
     icon: "/favicon.ico",
     apple: "/icon.png",
-  },
-  openGraph: {
-    title: "Future Energy BD",
-    description: "Your trusted green energy e-commerce store in Bangladesh",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Future Energy BD" }],
   },
 };
 
